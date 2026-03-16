@@ -1,0 +1,3474 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NAI Ogled">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#AF2D37">
+<title>NAI Ogled</title>
+<script>
+const manifestData = {
+  name: "NAI Significa – Ogled",
+  short_name: "NAI Ogled",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#EBEBEB",
+  theme_color: "#AF2D37",
+  orientation: "portrait",
+  icons: [{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==",sizes:"192x192",type:"image/png"}]
+};
+const blob = new Blob([JSON.stringify(manifestData)],{type:'application/json'});
+document.write('<link rel="manifest" href="'+URL.createObjectURL(blob)+'">');
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+button{color:inherit;-webkit-appearance:none;appearance:none;}
+a{color:inherit;}
+:root{
+  --red:#AF2D37;
+  --black:#1A1A1A;
+  --gray:#6D7276;
+  --light:#EBEBEB;
+  --white:#FFFFFF;
+  --border:#D4D4D4;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--light);color:var(--black);
+  min-height:100vh;
+  padding-bottom:calc(88px + env(safe-area-inset-bottom));
+}
+
+/* HEADER */
+header{
+  background:var(--red);
+  position:sticky;top:0;z-index:100;
+  padding-top:env(safe-area-inset-top);
+  box-shadow:0 2px 8px rgba(175,45,55,0.3);
+}
+.hdr-main{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;}
+.hdr-logo{font-size:13px;font-weight:800;color:white;text-transform:uppercase;letter-spacing:2px;}
+.hdr-btn{background:rgba(255,255,255,0.18);border:none;color:white;border-radius:4px;padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.8px;}
+.ctx-bar{background:rgba(0,0,0,0.18);padding:8px 16px;display:none;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,0.12);}
+.ctx-bar.show{display:flex;}
+.ctx-bar img{width:18px;height:18px;object-fit:contain;opacity:.9;}
+.ctx-bar .ctx-naslov{font-size:13px;font-weight:600;color:rgba(255,255,255,.92);flex:1;}
+.ctx-bar .ctx-datum{font-size:11px;color:rgba(255,255,255,.55);}
+.prog-bar{height:2px;background:rgba(255,255,255,.2);}
+.prog-fill{height:100%;background:white;transition:width .3s;}
+
+/* PAGES */
+.page{display:none;}.page.active{display:block;}
+
+/* INSTALL BANNER */
+.install-banner{
+  background:var(--black);color:white;
+  padding:12px 16px;display:flex;align-items:center;gap:12px;
+}
+.install-banner.hidden{display:none;}
+.ib-text{flex:1;}
+.ib-title{font-size:13px;font-weight:700;}
+.ib-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;}
+.ib-btn{background:var(--red);border:none;color:white;border-radius:4px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.ib-close{background:transparent;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;}
+
+/* LIST */
+.list-top{padding:14px 16px 8px;}
+.list-top h2{font-size:19px;font-weight:800;letter-spacing:-.3px;}
+.list-top p{font-size:13px;color:var(--gray);margin-top:4px;}
+
+.storage-row{
+  margin:0 16px 12px;padding:12px 14px;
+  background:var(--white);border-radius:6px;border:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.stor-bar-wrap{flex:1;}
+.stor-lbl{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.stor-bar{height:4px;background:var(--light);border-radius:2px;overflow:hidden;}
+.stor-fill{height:100%;background:var(--red);border-radius:2px;transition:width .3s;}
+.stor-cnt{font-size:12px;font-weight:800;color:var(--black);white-space:nowrap;}
+
+.date-group{margin:0 16px 16px;}
+.date-hdr{
+  font-size:10px;font-weight:800;color:var(--gray);
+  text-transform:uppercase;letter-spacing:1.2px;
+  padding:0 0 8px;display:flex;align-items:center;gap:8px;
+}
+.date-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
+.date-cnt{
+  background:var(--border);color:var(--gray);
+  border-radius:3px;padding:2px 7px;font-size:10px;font-weight:800;
+}
+
+.ogled-card{background:var(--white);border-radius:6px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:8px;}
+.ogled-top{padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.ogled-ico{width:38px;height:38px;object-fit:contain;opacity:.8;flex-shrink:0;}
+.ogled-info{flex:1;min-width:0;}
+.ogled-title{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ogled-meta{font-size:12px;color:var(--gray);margin-top:2px;}
+.ogled-badge{background:var(--red);color:white;border-radius:3px;padding:3px 7px;font-size:10px;font-weight:800;text-transform:uppercase;flex-shrink:0;}
+.ogled-actions{display:flex;border-top:1px solid var(--border);}
+.act-btn{flex:1;border:none;background:transparent;padding:11px 6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--black);text-transform:uppercase;letter-spacing:.5px;}
+.act-btn:not(:last-child){border-right:1px solid var(--border);}
+.act-btn.r{color:var(--red);}
+.act-btn.muted{color:var(--gray);}
+
+.empty-state{text-align:center;padding:60px 30px;}
+.empty-state p{font-size:15px;color:var(--gray);line-height:1.8;}
+
+/* FORM */
+.form-body{padding-bottom:100px;}
+.step-head{padding:16px 16px 6px;}
+.step-head h2{font-size:19px;font-weight:800;letter-spacing:-.3px;}
+.step-head p{font-size:13px;color:var(--gray);margin-top:3px;line-height:1.4;}
+
+.card{background:var(--white);margin:0 12px 8px;border-radius:6px;border:1px solid var(--border);padding:13px 14px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.card-lbl{font-size:10px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+.card-lbl::before{content:'';width:2px;height:12px;background:var(--red);border-radius:2px;flex-shrink:0;}
+
+.field{margin-bottom:16px;}
+.field:last-child{margin-bottom:0;}
+.field>label{display:block;font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+
+input[type=text],input[type=email],select,textarea{
+  width:100%;background:var(--light);border:1.5px solid var(--border);
+  border-radius:5px;padding:11px 12px;font-family:inherit;
+  font-size:15px;color:var(--black);outline:none;-webkit-appearance:none;
+  transition:border-color .15s,background .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--red);background:var(--white);}
+textarea{resize:none;line-height:1.6;}
+
+/* TIP ROWS */
+.tip-selector{display:flex;flex-direction:column;gap:10px;margin:0 16px 12px;}
+.tip-row{
+  background:var(--red);border:2px solid var(--red);
+  border-radius:8px;display:flex;align-items:center;gap:12px;
+  padding:14px 14px;cursor:pointer;transition:all .12s;
+  box-shadow:0 2px 8px rgba(175,45,55,0.25);
+}
+.tip-row:active{transform:scale(.97);opacity:.9;}
+.tip-ico{width:40px;height:40px;object-fit:contain;flex-shrink:0;}
+.tip-text{flex:1;}
+.tip-name{font-size:16px;font-weight:800;letter-spacing:-.2px;color:white;}
+
+.tip-arr{color:rgba(255,255,255,.6);font-size:22px;font-weight:300;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{background:var(--light);border:1.5px solid var(--border);border-radius:5px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;user-select:none;transition:all .12s;color:var(--black);-webkit-appearance:none;}
+.chip.on{background:var(--red);border-color:var(--red);color:white;}
+.chip.nz{background:var(--gray);border-color:var(--gray);color:white;}
+.chips.sm .chip{padding:7px 11px;font-size:12px;}
+.chip-input{
+  background:var(--light);border:1.5px dashed var(--border);
+  border-radius:5px;padding:10px 14px;font-size:14px;font-weight:600;
+  font-family:inherit;color:var(--black);outline:none;
+  width:110px;transition:all .15s;
+}
+.chip-input:focus,.chip-input.active{
+  border-color:var(--red);border-style:solid;
+  background:var(--white);width:140px;
+}
+.divider{height:1px;background:var(--border);margin:12px 0;}
+
+/* NAV */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--white);border-top:1px solid var(--border);
+  padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  display:flex;gap:10px;
+  box-shadow:0 -2px 12px rgba(0,0,0,.06);z-index:100;
+}
+.btn-back{background:var(--light);border:none;border-radius:5px;padding:12px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--gray);font-family:inherit;text-transform:uppercase;letter-spacing:.5px;}
+.btn-fwd{flex:1;background:var(--red);border:none;border-radius:5px;padding:12px;font-size:13px;font-weight:800;color:white;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;}
+.btn-fwd:active{opacity:.88;}
+.btn-primary{display:block;width:100%;background:var(--red);color:white;border:none;border-radius:5px;padding:16px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;}
+.btn-ghost{width:100%;background:transparent;border:1.5px solid var(--border);border-radius:5px;padding:14px;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;font-family:inherit;text-transform:uppercase;}
+.hidden{display:none!important;}
+
+/* VAL ERR */
+.val-err{
+  background:#FDECEA;border-left:4px solid var(--red);
+  border-radius:0 6px 6px 0;padding:13px 16px;
+  margin:12px 16px;font-size:14px;color:var(--red);
+  font-weight:700;display:none;
+  box-shadow:0 2px 8px rgba(175,45,55,0.15);
+}
+.val-err.show{display:flex;align-items:center;gap:10px;}
+.val-err.show::before{content:'!';width:22px;height:22px;background:var(--red);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.naslov-hint{font-size:12px;color:var(--gray);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.naslov-hint.filled{color:var(--red);font-weight:600;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake .4s ease;}
+
+/* OPIS */
+.opis-card{background:var(--white);margin:0 16px 12px;border-radius:6px;border:1px solid var(--border);overflow:hidden;}
+.opis-hdr{background:var(--red);color:white;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
+.btn-copy{background:rgba(255,255,255,.2);border:none;border-radius:3px;color:white;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.opis-text{padding:18px;font-size:15px;line-height:1.85;color:var(--black);white-space:pre-wrap;min-height:80px;}
+.email-sec{padding:0 16px 24px;}
+.email-sec label{display:block;font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.btn-send{width:100%;background:var(--red);border:none;border-radius:5px;padding:15px;font-size:14px;font-weight:800;color:white;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+
+/* TOAST */
+/* PROSTORI */
+.etaza-card{background:var(--white);margin:0 8px 8px;border-radius:6px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.etaza-hdr{background:var(--black);color:white;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;}
+.etaza-naziv{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;}
+.etaza-skupaj{font-size:11px;color:rgba(255,255,255,.55);font-weight:600;}
+.prostori-grid{padding:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.prostor-item{background:var(--white);border:1.5px solid transparent;border-radius:6px;padding:4px 2px 3px;display:flex;flex-direction:column;gap:2px;transition:border-color .15s;min-width:0;overflow:hidden;box-sizing:border-box;}
+.prostor-item.active{border-color:transparent;background:var(--light);}
+.prostor-naziv{font-size:12px;font-weight:700;color:var(--black);text-align:center;line-height:1.2;word-break:break-word;padding:0 2px;}
+.prostor-ctrl{display:flex;align-items:center;justify-content:center;gap:0;width:100%;}
+.prostor-btn{width:18px;height:22px;border:none;border-radius:4px;background:var(--border);font-size:13px;font-weight:700;cursor:pointer;color:var(--black);display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;transition:all .1s;flex-shrink:0;}
+.prostor-btn:active{background:var(--red);color:white;}
+.prostor-btn.minus{border-radius:4px 0 0 4px;}
+.prostor-btn.plus{border-radius:0 4px 4px 0;background:var(--border);color:var(--black);}
+.prostor-btn.plus:active{background:#BBBFC2;color:var(--black);}
+.prostor-st{width:22px;flex-shrink:0;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--black);background:white;border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);}
+.prostor-item.active .prostor-st{color:var(--black);font-weight:900;}
+.neizd-grid{padding:10px 14px 12px;display:flex;flex-wrap:wrap;gap:6px;}
+.prostor-drugo{background:transparent!important;border:none!important;padding:8px 4px 4px!important;}
+
+
+
+.chip.multi-on{background:var(--red);border-color:var(--red);color:white;}
+/* OBNOVE TABLE */
+.obnova-row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);gap:10px;}
+.obnova-row:last-child{border-bottom:none;}
+.obnova-ime{font-size:13px;font-weight:600;color:var(--black);padding-left:4px;}
+.obnova-leto{width:64px;min-width:64px;max-width:64px;flex-shrink:0;background:var(--light);border:1.5px solid var(--border);border-radius:5px;padding:7px 6px;font-size:14px;font-weight:700;text-align:center;font-family:inherit;outline:none;-webkit-appearance:none;}
+.obnova-leto:focus{border-color:var(--red);background:white;}
+.obnova-leto.filled{border-color:var(--red);color:var(--red);}
+/* CONDITIONAL FIELDS */
+.cond-fields{margin-top:10px;padding:12px;background:rgba(175,45,55,.04);border-radius:5px;border:1px solid rgba(175,45,55,.15);}
+.cond-fields .card-lbl{font-size:10px;margin-bottom:8px;}
+/* CENA */
+.cena-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.cena-row .chip{font-size:13px;padding:9px 13px;}
+.sekcija-lbl{font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 8px;}
+.sekcija-lbl:first-child{margin-top:0;}
+
+
+
+/* CONDITIONAL FIELDS */
+
+.cond-fields .card-lbl{font-size:10px;margin-bottom:8px;}
+/* CENA */
+
+.cena-row .chip{font-size:13px;padding:9px 13px;}
+
+.sekcija-lbl:first-child{margin-top:0;}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--black);color:white;padding:10px 20px;border-radius:5px;font-size:12px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;z-index:200;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* NEIZDELANO — enoten stil */
+.neizd-chip{background:var(--light);border:1.5px solid var(--border);border-radius:5px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--black);transition:all .12s;-webkit-appearance:none;}
+.neizd-chip.on{background:var(--red)!important;border-color:var(--red)!important;color:white!important;}
+.etaza-hdr.neizd{background:var(--black)!important;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-main">
+    <span class="hdr-logo">NAI Significa</span>
+    <button class="hdr-btn hidden" id="hdrBack" onclick="showList()">← Ogledi</button>
+  </div>
+  <div class="ctx-bar" id="ctxBar">
+    <img id="ctxIco" src="">
+    <span class="ctx-naslov" id="ctxNaslov"></span>
+    <span class="ctx-datum" id="ctxDatum"></span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+</header>
+
+<!-- PWA INSTALL BANNER -->
+<div class="install-banner hidden" id="installBanner">
+  <div class="ib-text">
+    <div class="ib-title">&#128241; Namesti kot aplikacijo</div>
+    <div class="ib-sub">Deluje brez interneta · Ikona na domačem zaslonu</div>
+  </div>
+  <button class="ib-btn" id="installBtn" onclick="installPWA()">Namesti</button>
+  <button class="ib-close" onclick="closeBanner()">&#215;</button>
+</div>
+
+<!-- ══ LIST ════════════════════ -->
+<div class="page active" id="pageList">
+  <div class="list-top">
+    <h2>Ogledi nepremičnin</h2>
+    <p id="listSub">Nalagam...</p>
+  </div>
+  <div style="padding:0 16px 10px;">
+    <button class="btn-primary" onclick="zacniNov()">+ Nov ogled</button>
+  </div>
+  <div class="storage-row">
+    <div class="stor-bar-wrap">
+      <div class="stor-lbl">Shranjeni ogledi</div>
+      <div class="stor-bar"><div class="stor-fill" id="storFill" style="width:0%"></div></div>
+    </div>
+    <span class="stor-cnt" id="storCnt">0 / 100</span>
+  </div>
+  <div id="listWrap" style="padding:4px 0 8px;"></div>
+</div>
+
+<!-- ══ FORM ════════════════════ -->
+<div class="page" id="pageForm">
+  <div class="val-err" id="valErr"></div>
+  <div class="form-body" id="formBody"></div>
+</div>
+
+<!-- ══ OPIS ════════════════════ -->
+<div class="page" id="pageOpis">
+  <div class="step-head">
+    <h2>Ogled zaključen</h2>
+    <p>Preverite podatke in pošljite opis.</p>
+  </div>
+
+  <!-- Povzetek kartica -->
+  <div class="card" id="opisSummary" style="margin-bottom:12px;">
+    <div class="card-lbl">Povzetek ogleda</div>
+    <div id="sumContent"></div>
+  </div>
+
+  <!-- Opis -->
+  <div class="opis-card">
+    <div class="opis-hdr">
+      Besedilni opis
+      <div style="display:flex;gap:6px;">
+        <button class="btn-copy" onclick="kopiraj()">Kopiraj</button>
+        <button class="btn-copy" onclick="resetOpis()" style="background:rgba(255,255,255,0.1);">Ponastavi</button>
+      </div>
+    </div>
+    <div class="opis-text" id="opisText" contenteditable="true"></div>
+  </div>
+
+  <!-- Email -->
+  <div class="email-sec">
+    <button class="btn-send" onclick="deliOpis()">&#9993; Pošlji opis</button>
+    <button class="btn-ghost" style="margin-top:8px;" onclick="showList()">← Nazaj na seznam</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav hidden" id="navBar">
+  <button class="btn-back hidden" id="btnBack" onclick="prevStep()">← Nazaj</button>
+  <button class="btn-fwd" id="btnFwd" onclick="nextStep()">Naprej →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════
+// ICONS
+// ═══════════════════════
+const ICO = {
+  hisa:        "data:image/png;base64,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",
+  stanovanje:  "data:image/png;base64,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",
+  stan_v_hisi: "data:image/png;base64,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",
+  poslovni:    "data:image/png;base64,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"
+};
+const ICO_DARK = {
+  hisa:        "data:image/png;base64,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",
+  stanovanje:  "data:image/png;base64,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",
+  stan_v_hisi: "data:image/png;base64,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",
+  poslovni:    "data:image/png;base64,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"
+};
+
+
+// ═══════════════════════
+// STORAGE — datumske mape, max 100
+// ═══════════════════════
+const SK = 'nai_v3';
+const MAX = 100;
+
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function fmtDatum(k) {
+  const [y,m,d] = k.split('-');
+  return d + '. ' + m + '. ' + y;
+}
+
+const db = {
+  _cache: null,
+
+  load() {
+    if (this._cache) return this._cache;
+    try { this._cache = JSON.parse(localStorage.getItem(SK)||'{}'); }
+    catch(e) { this._cache = {}; }
+    return this._cache;
+  },
+
+  save(d) {
+    this._cache = d;
+    localStorage.setItem(SK, JSON.stringify(d));
+  },
+
+  shrani(o) {
+    const d = this.load();
+    const k = o.datum_key || todayKey();
+    if (!d[k]) d[k] = [];
+    const i = d[k].findIndex(x => x.id === o.id);
+    if (i > -1) {
+      d[k][i] = o;
+    } else {
+      const skupaj = Object.values(d).reduce((s,a)=>s+a.length, 0);
+      if (skupaj >= MAX) {
+        const oldest = Object.keys(d).sort()[0];
+        if (d[oldest]) {
+          d[oldest].shift();
+          if (!d[oldest].length) delete d[oldest];
+        }
+      }
+      d[k].push(o);
+    }
+    this.save(d);
+  },
+
+  izbrisi(id) {
+    const d = this.load();
+    Object.keys(d).forEach(k => {
+      d[k] = d[k].filter(o => o.id !== id);
+      if (!d[k].length) delete d[k];
+    });
+    this.save(d);
+  },
+
+  poDateh() {
+    const d = this.load();
+    return Object.keys(d).sort().reverse().map(k => ({
+      key: k, label: fmtDatum(k), ogledi: [...d[k]].reverse()
+    }));
+  },
+
+  skupaj() { return Object.values(this.load()).reduce((s,a)=>s+a.length, 0); },
+
+  // O(1) lookup z indeksom namesto O(n) iskanja
+  najdi(id) {
+    const d = this.load();
+    for (const k of Object.keys(d)) {
+      const o = d[k].find(x => x.id === id);
+      if (o) return o;
+    }
+    return null;
+  }
+};
+
+// ═══════════════════════
+// STATE
+// ═══════════════════════
+let G = null, stepIdx = 0, steps = [];
+
+function newG() {
+  const k = todayKey();
+  return { id: Date.now().toString(), datum_key: k, datum: fmtDatum(k),
+           naslov: '', tip: '', leto_izgradnje: '', vrsta: '', vseljeno: '', vzdrzevano: '',
+           etaznost: '',
+           // stanovanje / svh
+           nadstropje: '', dvigalo: '', st_stanovanj: '',
+           orient_VSE: false, orient_S: false, orient_J: false, orient_V: false, orient_Z: false, orient_SZ: false, orient_SV: false, orient_JV: false, orient_JZ: false,
+           // poslovni
+           povrsina: '', prezracevanje: '',
+           prostori: { K:{}, P:{}, '1N':{}, '2N':{}, M:{}, STA:{}, POS:{} },
+           neizdelano: [], neizd_drugo: '',
+           tlaki: [], tlaki_drugo: '', zasteklitev_tip: '', zasteklitev_okvir: '',
+           ogr_prostori: [], ogr_prostori_drugo: '', ogr_voda: [], ogr_voda_drugo: '',
+           ogrevala: [], ogrevala_drugo: '',
+           opombe_prostori: '',
+           prikl_elektrika: '', prikl_vodovod: '', prikl_vodovod_alt: [],
+           prikl_kanal: '', prikl_kanal_alt: [],
+           prikl_plin: '', prikl_telekom: '', prikl_parkiranje: [],
+           obnove: {},
+           cena_oglas: '', cena_pogodba: '', dokumentacija: '',
+           posebnosti: '' };
+}
+
+function buildSteps() {
+  steps = ['naslov_tip'];
+  if (G.tip === 'hisa')        steps.push('hisa_vse','hisa_prostori','hisa_instalacije','hisa_prikljucki','hisa_obnove','hisa_zakljucek');
+  if (G.tip === 'stan_v_hisi') steps.push('svh_vse','svh_prostori','svh_instalacije','svh_prikljucki','svh_obnove','svh_zakljucek');
+  if (G.tip === 'stanovanje')  steps.push('sta_vse','sta_prostori','sta_instalacije','sta_obnove','sta_zakljucek');
+  if (G.tip === 'poslovni')    steps.push('pos_vse','pos_prostori','pos_instalacije','pos_prikljucki','pos_zakljucek');
+}
+
+// ═══════════════════════
+// ROUTING
+// ═══════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const isForm = id === 'pageForm';
+  document.getElementById('navBar').classList.toggle('hidden', !isForm);
+  document.getElementById('hdrBack').classList.toggle('hidden', id === 'pageList');
+  // Na opis strani gumb kaže "← Nazaj"
+  if (id === 'pageOpis') {
+    const btn = document.getElementById('hdrBack');
+    btn.classList.remove('hidden');
+    btn.textContent = '← Nazaj';
+  } else if (id === 'pageForm') {
+    document.getElementById('hdrBack').textContent = '← Ogledi';
+  }
+  window.scrollTo(0,0);
+}
+
+function updateCtx() {
+  const bar = document.getElementById('ctxBar');
+  if (!G || !G.naslov || stepIdx === 0) { bar.classList.remove('show'); return; }
+  document.getElementById('ctxIco').src = ICO[G.tip] || '';
+  document.getElementById('ctxNaslov').textContent = G.naslov;
+  document.getElementById('ctxDatum').textContent = G.datum;
+  bar.classList.add('show');
+}
+
+function updateProg() {
+  const pct = steps.length ? Math.round(((stepIdx+1)/steps.length)*100) : 0;
+  document.getElementById('pFill').style.width = pct + '%';
+  document.getElementById('btnBack').classList.toggle('hidden', stepIdx === 0);
+  document.getElementById('btnFwd').textContent =
+    stepIdx >= steps.length-1 ? 'Generiraj opis →' : 'Naprej →';
+}
+
+function updateStorage() {
+  const n = db.skupaj(), pct = Math.round(n/MAX*100);
+  document.getElementById('storFill').style.width = pct + '%';
+  document.getElementById('storFill').style.background = pct > 80 ? '#c0392b' : 'var(--red)';
+  document.getElementById('storCnt').textContent = n + ' / ' + MAX;
+}
+
+// ═══════════════════════
+// LIST
+// ═══════════════════════
+function showList() {
+  const grupe = db.poDateh();
+  const n = db.skupaj();
+  document.getElementById('listSub').textContent =
+    n ? n + ' ogledov · ' + grupe.length + ' dni' : 'Ni shranjenih ogledov';
+  updateStorage();
+
+  const c = document.getElementById('listWrap');
+  if (!n) {
+    c.innerHTML = '<div class="empty-state"><p>Pritisnite <b>+ Nov ogled</b><br>za začetek.</p></div>';
+  } else {
+    c.innerHTML = grupe.map(g => `
+      <div class="date-group">
+        <div class="date-hdr">${g.label}<span class="date-cnt">${g.ogledi.length}</span></div>
+        ${g.ogledi.map(o => `
+          <div class="ogled-card">
+            <div class="ogled-top">
+              <img class="ogled-ico" src="${ICO_DARK[o.tip]||''}" alt="">
+              <div class="ogled-info">
+                <div class="ogled-title">${o.naslov||'Brez naslova'}</div>
+                <div class="ogled-meta">${tipL(o.tip)}${o.vrsta?' · '+o.vrsta:''}${o.leto_izgradnje?' · '+o.leto_izgradnje:''}</div>
+              </div>
+              <span class="ogled-badge">${tipS(o.tip)}</span>
+            </div>
+            <div class="ogled-actions">
+              <button class="act-btn" onclick="uredi('${o.id}')">Uredi</button>
+              <button class="act-btn r" onclick="prikaziOpis('${o.id}')">Opis / Pošlji</button>
+              <button class="act-btn muted" onclick="del('${o.id}')">Izbriši</button>
+            </div>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+  showPage('pageList');
+}
+
+const tipL = t => ({stanovanje:'Stanovanje',stan_v_hisi:'Stan. v hiši',hisa:'Hiša',poslovni:'Poslovni objekt'}[t]||'—');
+const tipS = t => ({stanovanje:'STAN',stan_v_hisi:'S.HIŠA',hisa:'HIŠA',poslovni:'POSL.'}[t]||'?');
+
+function zacniNov() { db._cache=null; G=newG(); stepIdx=0; buildSteps(); renderStep(); showPage('pageForm'); }
+function uredi(id) {
+  const o = db.najdi(id); if(!o) return;
+  G = {...o}; stepIdx=0; buildSteps(); renderStep(); showPage('pageForm');
+}
+function prikaziOpis(id) {
+  const o = db.najdi(id); if(!o) return;
+  G = {...o};
+  document.getElementById('opisText').innerText = genOpis(G);
+  showPage('pageOpis');
+}
+function del(id) {
+  if(confirm('Izbrisati ta ogled?')) { db.izbrisi(id); showList(); toast('Ogled izbrisan.'); }
+}
+
+// ═══════════════════════
+// FORM
+// ═══════════════════════
+function renderStep() {
+  document.getElementById('valErr').classList.remove('show');
+  document.getElementById('formBody').innerHTML = stepHTML(steps[stepIdx]);
+  updateProg(); updateCtx();
+  // Reset auto-advance timer after render
+  clearTimeout(autoTimer);
+}
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function clearValErr() {
+  document.getElementById('valErr').classList.remove('show');
+  const hint = document.getElementById('naslovHint');
+  if (hint) {
+    if (G.naslov.trim()) {
+      hint.textContent = 'Zdaj izberite vrsto nepremičnine ↓';
+      hint.classList.add('filled');
+    } else {
+      hint.textContent = 'Vnesite naslov, nato izberite vrsto nepremičnine.';
+      hint.classList.remove('filled');
+    }
+  }
+}
+
+function chipsHTML(field, vals) {
+  const filtered = vals.filter(v => v !== 'Ni znano');
+  const chips = filtered.map(v => {
+    const on = G[field]===v;
+    return `<button class="chip${on?' on':''}" onclick="setF('${field}','${v}',this)">${v}</button>`;
+  }).join('');
+  const isCustom = G[field] && !filtered.includes(G[field]);
+  return chips + `<input type="text" class="chip-input${isCustom?' active':''}"
+    placeholder="Drugo..." value="${esc(isCustom?G[field]:'')}"
+    oninput="setCustom('${field}',this)"
+    onfocus="clearChips('${field}',this)">`;
+}
+
+// Multi-select chips (array field)
+function multiChipsHTML(field, vals) {
+  const arr = G[field] || [];
+  const chips = vals.map(v => {
+    const on = arr.includes(v);
+    return '<button class="chip ' + (on?'multi-on':'') + '"' +
+      ' data-field="' + field + '" data-val="' + esc(v) + '"' +
+      ' onclick="togMultiData(this)">' + v + '</button>';
+  }).join('');
+  const customVal = G[field + '_drugo'] || '';
+  return chips +
+    '<input type="text" class="chip-input ' + (customVal?'active':'') + '"' +
+    ' placeholder="Drugo..."' +
+    ' value="' + esc(customVal) + '"' +
+    ' data-field="' + field + '"' +
+    ' oninput="setMultiDrugo(this)">';
+}
+
+function renderDrugRow(letoClass, letoVal, imeVal) {
+  const div = document.createElement('div');
+  div.className = 'obnova-row';
+
+  const imeInp = document.createElement('input');
+  imeInp.type = 'text';
+  imeInp.placeholder = 'Drugo';
+  imeInp.value = imeVal;
+  imeInp.style.cssText = 'flex:1;font-size:13px;background:var(--light);border:1.5px solid var(--border);border-radius:5px;padding:6px 10px;font-family:inherit;outline:none;color:var(--black);';
+  imeInp.onfocus = function() { this.style.borderColor='var(--red)'; };
+  imeInp.onblur  = function() { this.style.borderColor=''; };
+  imeInp.oninput = function() { setObnovaDrugo('ime', this.value); };
+
+  const letoInp = document.createElement('input');
+  letoInp.type = 'text'; letoInp.inputMode = 'numeric'; letoInp.maxLength = 4;
+  letoInp.className = 'obnova-leto ' + letoClass;
+  letoInp.placeholder = 'leto'; letoInp.value = letoVal;
+  letoInp.oninput = function() { setObnovaDrugo('leto', this.value); };
+
+  div.appendChild(imeInp);
+  div.appendChild(letoInp);
+  return div.outerHTML;
+}
+
+function setObnovaStatus(val, el) {
+  if (!G.obnove) G.obnove = {};
+  const curr = G.obnove['_status'] || '';
+  if (curr === val) {
+    delete G.obnove['_status'];
+    el.classList.remove('on');
+  } else {
+    G.obnove['_status'] = val;
+    el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    // Auto-naprej po 400ms
+    setTimeout(() => { if (G.obnove && G.obnove['_status'] === val) nextStep(); }, 200);
+  }
+}
+
+function setObnova(key, val) {
+  if (!G.obnove) G.obnove = {};
+  if (!G.obnove[key]) G.obnove[key] = {};
+  G.obnove[key].leto = val;
+  const el = document.querySelector('[data-key="' + key + '"]');
+  if (el) el.classList.toggle('filled', val.length > 0);
+}
+
+function setObnovaDrugo(subkey, val) {
+  if (!G.obnove) G.obnove = {};
+  if (!G.obnove['drugo']) G.obnove['drugo'] = {};
+  G.obnove['drugo'][subkey] = val;
+}
+
+function setCena(field, val, el) {
+  G[field] = val;
+  const card = el.closest('.card');
+  if (card) { const inp = card.querySelector('input[type=text][inputmode=numeric]'); if(inp) inp.value=''; }
+  el.closest('.cena-row').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function setCenaNum(field, inp) {
+  G[field] = inp.value;
+  // Deselect chips
+  const row = inp.previousElementSibling;
+  if (row) row.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+}
+
+function togMulti(field, val, el) {
+  if (!G[field]) G[field] = [];
+  const i = G[field].indexOf(val);
+  if (i > -1) { G[field].splice(i,1); el.classList.remove('multi-on'); }
+  else         { G[field].push(val);  el.classList.add('multi-on'); }
+}
+
+function setMultiDrugo(inp) {
+  const field = inp.dataset.field;
+  if (field) G[field + '_drugo'] = inp.value;
+  inp.classList.toggle('active', inp.value.length > 0);
+}
+
+function togMultiData(el) {
+  const field = el.dataset.field;
+  const val   = el.dataset.val;
+  togMulti(field, val, el);
+}
+
+function setCustom(field, inp) {
+  G[field] = inp.value;
+  inp.classList.toggle('active', inp.value.length > 0);
+  inp.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on','nz'));
+  autoCheck();
+}
+
+function clearChips(field, inp) {
+  inp.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on','nz'));
+}
+
+function stepHTML(s) {
+  if (s === 'naslov_tip') return `
+    <div class="step-head"><h2>Nov ogled</h2><p>Naslov in vrsta nepremičnine.</p></div>
+    <div class="card" id="naslovCard">
+      <div class="card-lbl">Naslov / kraj <span style="color:var(--red);margin-left:4px;">*</span></div>
+      <input type="text" id="fNaslov" placeholder="npr. Vojkova cesta 77, Ljubljana"
+        value="${esc(G.naslov)}"
+        oninput="G.naslov=this.value;clearValErr()"
+        autocomplete="street-address"
+        style="font-size:17px;font-weight:600;">
+      <div class="naslov-hint" id="naslovHint">Vnesite naslov, nato izberite vrsto nepremičnine.</div>
+    </div>
+    <div class="tip-selector">
+      ${[['stanovanje','Stanovanje',''],
+         ['stan_v_hisi','Stanovanje v hiši',''],
+         ['hisa','Hiša',''],
+         ['poslovni','Poslovni objekt','']
+        ].map(([k,l,d]) => `
+        <div class="tip-row ${G.tip===k?'sel':''}" onclick="selTip('${k}',this)">
+          <img class="tip-ico" src="${ICO[k]}" alt="${l}">
+          <div class="tip-text"><div class="tip-name">${l}</div></div>
+          <span class="tip-arr">›</span>
+        </div>`).join('')}
+    </div>`;
+
+  if (s === 'hisa_vse') return `
+    <div class="step-head"><h2>Podatki o hiši</h2><p>Izpolnite podatke o objektu.</p></div>
+    <div class="card">
+
+      <div class="card-lbl">Leto izgradnje</div>
+      <input type="text" inputmode="numeric" id="fLeto"
+        placeholder="npr. 1988"
+        value="${esc(G.leto_izgradnje)}"
+        maxlength="4"
+        oninput="G.leto_izgradnje=this.value">
+
+      <div class="divider"></div>
+
+      <div class="card-lbl">Tip objekta</div>
+      <div class="chips">
+        ${chipsHTML('vrsta',['Samostojna','Dvojček','Vrstna','Atrijska'])}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-lbl">Vseljena</div>
+      <div class="chips">
+        ${chipsHTML('vseljeno',['Da','Ne'])}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-lbl">Vzdrževana</div>
+      <div class="chips">
+        ${chipsHTML('vzdrzevano',['Da','Ne'])}
+      </div>
+
+    </div>
+    <div class="card" style="background:rgba(175,45,55,0.04);border-color:rgba(175,45,55,0.15);">
+      <div class="card-lbl" style="color:var(--red);">Etažnost</div>
+      <p style="font-size:13px;color:var(--gray);line-height:1.6;">
+        Etažnost se <b>samodejno izračuna</b> na podlagi prostorov, ki jih boste izpolnili na naslednji strani.
+        Upoštevajo se tudi neizdelane etaže.
+      </p>
+    </div>`;
+
+  if (s === 'hisa_prostori') {
+    const etaze = [
+      {k:'K',  l:'Klet'},
+      {k:'P',  l:'Pritličje'},
+      {k:'1N', l:'Prvo nadstropje'},
+      {k:'2N', l:'Drugo nadstropje'},
+      {k:'M',  l:'Mansarda'},
+    ];
+    // Prostori po etažah — različni za vsako etažo
+    const prostoriPoEtazi = {
+      K:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+           {k:'tehnicni',l:'Teh. pr.'},{k:'kurilnica',l:'Kuril.'},
+           {k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},
+           {k:'garaza',l:'Garaža'},{k:'stranisce',l:'WC'},
+           {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+           {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+           {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+           {k:'terasa',l:'Terasa'}],
+      P:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+           {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+           {k:'utility',l:'Utility'},{k:'garaza',l:'Garaža'},
+           {k:'stranisce',l:'WC'},{k:'kopalnica',l:'Kopal.'},
+           {k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},
+           {k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},{k:'dnevna',l:'Dnevna'},
+           {k:'galerija',l:'Galer.'},{k:'loza',l:'Loža'},
+           {k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+      '1N': [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+             {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+             {k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+             {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+             {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+             {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+             {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+      '2N': [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+             {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+             {k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+             {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+             {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+             {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+             {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+      M:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+           {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+           {k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+           {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+           {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+           {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+           {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+    };
+    const neizdelanOpcije = ['K','P','1N','2N','M'];
+
+    // Ensure prostori object exists
+    if (!G.prostori) G.prostori = {};
+    if (!G.neizdelano) G.neizdelano = [];
+    etaze.forEach(e => { if (!G.prostori[e.k]) G.prostori[e.k] = {}; });
+
+    const etazeHTML = etaze.map(e => {
+      const ep = G.prostori[e.k] || {};
+      const skupaj = Object.values(ep).reduce((s,n)=>s+(n||0),0);
+      const pList = prostoriPoEtazi[e.k] || [];
+      const drugoDrugo = ep['drugo_text'] || '';
+      const etazaKey = e.k;
+      const gridHTML = pList.map(p => {
+        const n = ep[p.k] || 0;
+        return '<div class="prostor-item ' + (n>0?'active':'') + '" id="pi-' + etazaKey + '-' + p.k + '">' +
+          '<div class="prostor-naziv">' + p.l + '</div>' +
+          '<div class="prostor-ctrl">' +
+            '<button class="prostor-btn minus" onclick="sprProstor(\'' + etazaKey + '\',\'' + p.k + '\',-1)">−</button>' +
+            '<div class="prostor-st" id="ps-' + etazaKey + '-' + p.k + '">' + (n>0?n:'') + '</div>' +
+            '<button class="prostor-btn plus" onclick="sprProstor(\'' + etazaKey + '\',\'' + p.k + '\',1)">+</button>' +
+          '</div></div>';
+      }).join('') +
+      '<div class="prostor-item prostor-drugo" style="grid-column:1/-1;">' +
+        '<div class="prostor-naziv" style="text-align:left;margin-bottom:6px;">Drugo</div>' +
+        '<input type="text" class="chip-input ' + (drugoDrugo?'active':'') + '"' +
+        ' placeholder="Vpiši prostor..."' +
+        ' value="' + esc(drugoDrugo) + '"' +
+        ' style="width:100%;font-size:13px;"' +
+        ' data-etaza="' + etazaKey + '"' +
+        ' oninput="sprDrugo(this.dataset.etaza,this.value)">' +
+      '</div>';
+      return `<div class="etaza-card">
+        <div class="etaza-hdr">
+          <span class="etaza-naziv">${e.l}</span>
+          <span class="etaza-skupaj" id="es-${e.k}">${skupaj>0?skupaj+' prostorov':''}</span>
+        </div>
+        <div class="prostori-grid">${gridHTML}</div>
+      </div>`;
+    }).join('');
+
+    const neizdelanHTML = neizdelanOpcije.map(k => {
+      const on = G.neizdelano.includes(k);
+      return `<button class="neizd-chip ${on?'on':''}" onclick="togNeizd('${k}',this)">${k}</button>`;
+    }).join('') + `<input type="text" class="chip-input ${G.neizd_drugo?'active':''}"
+      placeholder="Drugo..." value="${esc(G.neizd_drugo||'')}"
+      oninput="G.neizd_drugo=this.value"
+      style="height:auto;padding:9px 13px;font-size:13px;width:90px;">`;
+
+    return `
+      <div class="step-head"><h2>Prostori</h2><p>Dodajte prostore po etažah.</p></div>
+      ${etazeHTML}
+      <div class="etaza-card">
+        <div class="etaza-hdr neizd">
+          <span class="etaza-naziv">Neizdelano</span>
+          <span class="etaza-skupaj">Etaže ki niso izdelane</span>
+        </div>
+        <div class="neizd-grid">${neizdelanHTML}</div>
+      </div>
+      <div class="card" style="margin-top:4px;">
+        <div class="card-lbl">Opombe</div>
+        <textarea id="fOpombeProstori" rows="3"
+          placeholder="npr. hiša je med-etažna, ima 5 nadstropij, nestandardna razporeditev..."
+          oninput="G.opombe_prostori=this.value"
+          style="font-size:14px;">${esc(G.opombe_prostori||'')}</textarea>
+      </div>
+    `;
+  }
+
+  if (s === 'hisa_instalacije') {
+    const ogrevaList = ['Ploskovna v talnem razvodu','Radiatorji','IR paneli','Električni grelniki','Konvertorji','Kamin'];
+    const ogrevaChips = ogrevaList.map(v => {
+      const on = (G.ogrevala||[]).includes(v);
+      return '<button class="chip ' + (on?'multi-on':'') + '"' +
+        ' data-val="' + esc(v) + '" onclick="togOgrevaloData(this)">' + v + '</button>';
+    }).join('') +
+    '<input type="text" class="chip-input ' + (G.ogrevala_drugo?'active':'') + '"' +
+    ' placeholder="Drugo..."' +
+    ' value="' + esc(G.ogrevala_drugo||'') + '"' +
+    ' oninput="G.ogrevala_drugo=this.value">';
+
+    return `
+    <div class="step-head"><h2>Inštalacije</h2><p>Tlaki, zasteklitev in ogrevanje.</p></div>
+
+    <div class="card">
+      <div class="card-lbl">Finalni tlaki</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">
+        ${multiChipsHTML('tlaki',['Parket','Vinil','Laminat','Keramika','Tapison','Pluta','Umetna masa','Ladijski pod','Teraco'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Zasteklitev</div>
+      <div class="sekcija-lbl">Tip stekla</div>
+      <div class="chips">
+        ${chipsHTML('zasteklitev_tip',['Starejša','2-slojna','3-slojna'])}
+      </div>
+      <div class="sekcija-lbl" style="margin-top:14px;">Material okvirjev</div>
+      <div class="chips">
+        ${chipsHTML('zasteklitev_okvir',['PVC','ALU','Leseni','PVC/ALU','ALU/Les'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Ogrevanje prostorov</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">
+        ${multiChipsHTML('ogr_prostori',['Daljinska toplota','Toplotna črpalka','Cen. plinska peč','Cen. peč na kurilno olje','Cen. peč na biomaso','Sam. plinska peč','Sam. peč na kurilno olje','Sam. peč na biomaso','El. peč','Klimatska naprava'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Ogrevanje vode (TSV)</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">
+        ${multiChipsHTML('ogr_voda',['Daljinska toplota','Toplotna črpalka','Cen. plinska peč','Cen. peč na kurilno olje','Cen. peč na biomaso','Sam. plinska peč','Sam. peč na kurilno olje','Sam. peč na biomaso','El. peč','El. grelnik'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Ogrevala</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">${ogrevaChips}</div>
+    </div>`;
+  }
+
+
+  // ── KORAK 4: PRIKLJUČKI ─────────────────────────────────────────
+  if (s === 'hisa_prikljucki') {
+    const daNeChip = (field, label) => {
+      const v = G[field];
+      return '<div class="card-lbl">' + label + '</div>' +
+        '<div class="chips">' +
+        '<button class="chip ' + (v==='Da'?'on':'') + '" onclick="setF(\'' + field + '\',\'Da\',this)">Da</button>' +
+        '<button class="chip ' + (v==='Ne'?'on':'') + '" onclick="setF(\'' + field + '\',\'Ne\',this)">Ne</button>' +
+        '</div>';
+    };
+
+    const vodAlt =
+      '<div class="cond-fields" id="cond-vodovod" style="display:' + (G.prikl_vodovod==='Ne'?'block':'none') + ';">' +
+        '<div class="card-lbl">Alternativni vir vode</div>' +
+        '<div class="chips">' +
+          multiChipsHTML('prikl_vodovod_alt',['Vodnjak','Kapnica','Izvir']) +
+        '</div></div>';
+
+    const kanAlt =
+      '<div class="cond-fields" id="cond-kanal" style="display:' + (G.prikl_kanal==='Ne'?'block':'none') + ';">' +
+        '<div class="card-lbl">Alternativna kanalizacija</div>' +
+        '<div class="chips">' +
+          multiChipsHTML('prikl_kanal_alt',['Greznica','Biološka čistilna naprava']) +
+        '</div></div>';
+
+    const parkHTML =
+      '<div class="card-lbl" style="margin-top:18px;">Parkiranje</div>' +
+      '<p style="font-size:12px;color:var(--gray);margin-bottom:10px;">Izberete lahko več možnosti.</p>' +
+      '<div class="chips">' +
+        multiChipsHTML('prikl_parkiranje',['Garaža v objektu','Garaža ob objektu','Na dvorišču','Pod nadstreškom','Ni urejeno']) +
+      '</div>';
+
+    return `
+      <div class="step-head"><h2>Priključki</h2><p>Komunalni priključki in parkiranje.</p></div>
+      <div class="card">
+        ${daNeChip('prikl_elektrika','Elektrika')}
+        <div class="divider"></div>
+        ${daNeChip('prikl_vodovod','Vodovod')}
+        ${vodAlt}
+        <div class="divider"></div>
+        ${daNeChip('prikl_kanal','Kanalizacija')}
+        ${kanAlt}
+        <div class="divider"></div>
+        ${daNeChip('prikl_plin','Plinovod')}
+        <div class="divider"></div>
+        ${daNeChip('prikl_telekom','Telekomunikacije')}
+        ${parkHTML}
+      </div>`;
+  }
+
+  // ── KORAK 5: OBNOVE ─────────────────────────────────────────────
+  if (s === 'hisa_obnove') {
+    const obnovaList = [
+      {k:'celotna',    l:'V celoti obnovljeno'},
+      {k:'streha',     l:'Streha'},
+      {k:'fasada',     l:'Fasada'},
+      {k:'okna',       l:'Okna'},
+      {k:'vrata_vh',   l:'Vhodna vrata'},
+      {k:'vrata_not',  l:'Notranja vrata'},
+      {k:'tlaki',      l:'Finalni tlaki'},
+      {k:'radiatorji', l:'Radiatorji'},
+      {k:'el_inst',    l:'El. instalacije'},
+      {k:'vod_inst',   l:'Vod. instalacije'},
+      {k:'kopalnica',  l:'Kopalnica'},
+      {k:'stranisce',  l:'Stranišče'},
+      {k:'pec',        l:'Peč za ogrevanje'},
+    ];
+    if (!G.obnove) G.obnove = {};
+    const drugObn = G.obnove['drugo'] || {leto:'', ime:''};
+    const drugRow = renderDrugRow(drugObn.leto?'filled':'', esc(drugObn.leto||''), esc(drugObn.ime||''));
+
+    const niObnovljenoVal = G.obnove['_status'] || '';
+    const statusRow =
+      '<div class="obnova-row" style="border-bottom:2px solid var(--border);margin-bottom:4px;padding-bottom:10px;">' +
+        '<div class="chips" style="flex:1;">' +
+          '<button class="chip ' + (niObnovljenoVal==='ni_obnovljeno'?'on':'') + '" data-sv="ni_obnovljeno" onclick="setObnovaStatus(this.dataset.sv,this)">Ni bilo obnovljeno</button>' +
+          '<button class="chip ' + (niObnovljenoVal==='ni_podatka'?'on':'') + '" data-sv="ni_podatka" onclick="setObnovaStatus(this.dataset.sv,this)">Ni podatka</button>' +
+        '</div>' +
+      '</div>';
+
+    const rowsHTML = statusRow + obnovaList.map(o => {
+      const val = (G.obnove[o.k]||{}).leto || '';
+      return '<div class="obnova-row">' +
+        '<input type="text" inputmode="numeric" maxlength="4"' +
+        ' class="obnova-leto ' + (val?'filled':'') + '"' +
+        ' placeholder="leto"' +
+        ' value="' + esc(val) + '"' +
+        ' data-key="' + o.k + '"' +
+        ' oninput="setObnova(this.dataset.key,this.value)">' +
+        '<div class="obnova-ime">' + o.l + '</div>' +
+      '</div>';
+    }).join('') +
+    drugRow;
+
+    return `
+      <div class="step-head"><h2>Obnove</h2><p>Vpišite letnico obnove kjer je relevantno.</p></div>
+      <div class="card">${rowsHTML}</div>`;
+  }
+
+  // ── KORAK 6: ZAKLJUČEK ──────────────────────────────────────────
+  if (s === 'hisa_zakljucek') {
+    const cenaChips = (field) => {
+      const v = G[field];
+      const isNum = v && v !== 'ne_prodaja' && v !== 'ne_povejo';
+      return '<div class="cena-row">' +
+        '<button class="chip ' + (v==='ne_prodaja'?'on':'') + '" onclick="setCena(\'' + field + '\',\'ne_prodaja\',this)">Se ne prodaja</button>' +
+        '<button class="chip ' + (v==='ne_povejo'?'on':'') + '" onclick="setCena(\'' + field + '\',\'ne_povejo\',this)">Ne povejo</button>' +
+        '</div>' +
+        '<input type="text" inputmode="numeric"' +
+        ' class="' + (isNum?'':'') + '"' +
+        ' placeholder="npr. 285.000 €"' +
+        ' value="' + esc(isNum?v:'') + '"' +
+        ' style="margin-top:8px;"' +
+        ' oninput="setCenaNum(\'' + field + '\',this)">';
+    };
+
+    return `
+      <div class="step-head"><h2>Zaključek</h2><p>Cena, dokumentacija in posebnosti.</p></div>
+
+      <div class="card">
+        <div class="card-lbl">Oglaševana cena</div>
+        ${cenaChips('cena_oglas')}
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">Pogodbena cena</div>
+        ${cenaChips('cena_pogodba')}
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">Dokumentacija</div>
+        <div class="chips">
+          ${chipsHTML('dokumentacija',['Nimajo','Že poslano','Še pošljejo'])}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">Posebnosti</div>
+        <textarea id="fPosebnosti" rows="4"
+          placeholder="npr. razgled, bližina gozda, posebna arhitektura, pravni zadržki..."
+          oninput="G.posebnosti=this.value"
+          style="font-size:14px;">${esc(G.posebnosti||'')}</textarea>
+      </div>`;
+  }
+
+
+  // STANOVANJE V HIŠI
+  if (s === 'svh_vse') return `
+    <div class="step-head"><h2>Podatki o stanovanju v hiši</h2><p>Izpolnite osnovne podatke.</p></div>
+    <div class="card">
+      <div class="card-lbl">Leto izgradnje objekta</div>
+      <input type="text" inputmode="numeric" id="fLeto"
+        placeholder="npr. 1988" value="${esc(G.leto_izgradnje)}" maxlength="4"
+        oninput="G.leto_izgradnje=this.value">
+      <div class="divider"></div>
+      <div class="card-lbl">Vseljena</div>
+      <div class="chips">${chipsHTML('vseljeno',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Vzdrževana</div>
+      <div class="chips">${chipsHTML('vzdrzevano',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Število stanovanj v objektu</div>
+      <div class="chips">${chipsHTML('st_stanovanj',['2','3','4','5+'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Nadstropje stanovanja</div>
+      <div class="chips">${chipsHTML('nadstropje',['P','VP','1','2','3','4','5','6','7','8','9','10'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Dvigalo</div>
+      <div class="chips">${chipsHTML('dvigalo',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Orientacija</div>
+      <div class="chips">
+        <button class="chip ${G.orient_VSE?'on':''}" onclick="togOrient('VSE',this)">Vse smeri</button>
+        <button class="chip ${G.orient_S?'on':''}" onclick="togOrient('S',this)">S</button>
+        <button class="chip ${G.orient_J?'on':''}" onclick="togOrient('J',this)">J</button>
+        <button class="chip ${G.orient_V?'on':''}" onclick="togOrient('V',this)">V</button>
+        <button class="chip ${G.orient_Z?'on':''}" onclick="togOrient('Z',this)">Z</button>
+        <button class="chip ${G.orient_SZ?'on':''}" onclick="togOrient('SZ',this)">SZ</button>
+        <button class="chip ${G.orient_SV?'on':''}" onclick="togOrient('SV',this)">SV</button>
+        <button class="chip ${G.orient_JV?'on':''}" onclick="togOrient('JV',this)">JV</button>
+        <button class="chip ${G.orient_JZ?'on':''}" onclick="togOrient('JZ',this)">JZ</button>
+      </div>
+    </div>`;
+
+  if (s === 'sta_prostori') return renderProstoriStan();
+  if (s === 'svh_prostori') return renderProstoriSVH();
+
+  if (s === 'svh_instalacije' || s === 'sta_instalacije') return `
+    <div class="step-head"><h2>Inštalacije</h2><p>Tlaki, zasteklitev in ogrevanje.</p></div>
+    ${renderInstalacije()}`;
+
+  if (s === 'svh_prikljucki' || s === 'pos_prikljucki') return `
+    <div class="step-head"><h2>Priključki</h2><p>Komunalni priključki in parkiranje.</p></div>
+    ${renderPrikljucki()}`;
+
+  if (s === 'svh_obnove' || s === 'sta_obnove') return renderObnoveStep();
+
+  if (s === 'svh_zakljucek' || s === 'sta_zakljucek' || s === 'pos_zakljucek') {
+    const cenaChips2 = (field) => {
+      const v = G[field];
+      const isNum = v && v !== 'ne_prodaja' && v !== 'ne_povejo';
+      return '<div class="cena-row">' +
+        '<button class="chip ' + (v==='ne_prodaja'?'on':'') + '" onclick="setCenaChip(\'' + field + '\',\'ne_prodaja\',this)">Se ne prodaja</button>' +
+        '<button class="chip ' + (v==='ne_povejo'?'on':'') + '" onclick="setCenaChip(\'' + field + '\',\'ne_povejo\',this)">Ne povejo</button>' +
+        '</div>' +
+        '<input type="text" inputmode="numeric" placeholder="npr. 285.000" value="' + esc(isNum?v:'') + '" style="margin-top:8px;" oninput="setCenaNum(\'' + field + '\',this)">';
+    };
+    return `
+      <div class="step-head"><h2>Zaključek</h2><p>Cena, dokumentacija in posebnosti.</p></div>
+      <div class="card">
+        <div class="card-lbl">Oglaševana cena</div>
+        ${cenaChips2('cena_oglas')}
+      </div>
+      <div class="card">
+        <div class="card-lbl">Pogodbena cena</div>
+        ${cenaChips2('cena_pogodba')}
+      </div>
+      <div class="card">
+        <div class="card-lbl">Dokumentacija</div>
+        <div class="chips">${chipsHTML('dokumentacija',['Nimajo','Že poslano','Še pošljejo'])}</div>
+      </div>
+      <div class="card">
+        <div class="card-lbl">Posebnosti</div>
+        <textarea rows="4" placeholder="npr. razgled, bližina gozda..."
+          oninput="G.posebnosti=this.value"
+          style="font-size:14px;">${esc(G.posebnosti||'')}</textarea>
+      </div>`;
+  }
+
+  // STANOVANJE
+  if (s === 'sta_vse') return `
+    <div class="step-head"><h2>Podatki o stanovanju</h2><p>Izpolnite osnovne podatke.</p></div>
+    <div class="card">
+      <div class="card-lbl">Leto izgradnje objekta</div>
+      <input type="text" inputmode="numeric" id="fLeto"
+        placeholder="npr. 1988" value="${esc(G.leto_izgradnje)}" maxlength="4"
+        oninput="G.leto_izgradnje=this.value">
+      <div class="divider"></div>
+      <div class="card-lbl">Vseljena</div>
+      <div class="chips">${chipsHTML('vseljeno',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Vzdrževana</div>
+      <div class="chips">${chipsHTML('vzdrzevano',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Število stanovanj v objektu</div>
+      <div class="chips">${chipsHTML('st_stanovanj',['2','3','4','5+'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Nadstropje stanovanja</div>
+      <div class="chips">${chipsHTML('nadstropje',['P','VP','1','2','3','4','5','6','7','8','9','10'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Dvigalo</div>
+      <div class="chips">${chipsHTML('dvigalo',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Orientacija</div>
+      <div class="chips">
+        <button class="chip ${G.orient_VSE?'on':''}" onclick="togOrient('VSE',this)">Vse smeri</button>
+        <button class="chip ${G.orient_S?'on':''}" onclick="togOrient('S',this)">S</button>
+        <button class="chip ${G.orient_J?'on':''}" onclick="togOrient('J',this)">J</button>
+        <button class="chip ${G.orient_V?'on':''}" onclick="togOrient('V',this)">V</button>
+        <button class="chip ${G.orient_Z?'on':''}" onclick="togOrient('Z',this)">Z</button>
+        <button class="chip ${G.orient_SZ?'on':''}" onclick="togOrient('SZ',this)">SZ</button>
+        <button class="chip ${G.orient_SV?'on':''}" onclick="togOrient('SV',this)">SV</button>
+        <button class="chip ${G.orient_JV?'on':''}" onclick="togOrient('JV',this)">JV</button>
+        <button class="chip ${G.orient_JZ?'on':''}" onclick="togOrient('JZ',this)">JZ</button>
+      </div>
+    </div>`;
+
+  // POSLOVNI OBJEKT
+  if (s === 'pos_vse') return `
+    <div class="step-head"><h2>Podatki o poslovnem objektu</h2><p>Izpolnite osnovne podatke.</p></div>
+    <div class="card">
+      <div class="card-lbl">Leto izgradnje</div>
+      <input type="text" inputmode="numeric" id="fLeto"
+        placeholder="npr. 1988" value="${esc(G.leto_izgradnje)}" maxlength="4"
+        oninput="G.leto_izgradnje=this.value">
+      <div class="divider"></div>
+      <div class="card-lbl">Tip objekta</div>
+      <div class="chips">${chipsHTML('vrsta',['Pisarna','Trgovsko-storitveni','Gostinski lokal','Skladišče','Delavnica','Drugo'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Zaseden</div>
+      <div class="chips">${chipsHTML('vseljeno',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Vzdrževan</div>
+      <div class="chips">${chipsHTML('vzdrzevano',['Da','Ne'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Površina (m²)</div>
+      <input type="text" inputmode="numeric" placeholder="npr. 120"
+        value="${esc(G.povrsina||'')}" oninput="G.povrsina=this.value">
+    </div>`;
+
+  if (s === 'pos_prostori') return renderProstoriPos();
+
+  if (s === 'pos_instalacije') return `
+    <div class="step-head"><h2>Inštalacije</h2><p>Tlaki, zasteklitev in ogrevanje.</p></div>
+    ${renderInstalacije()}
+    <div class="card" style="margin-top:8px;">
+      <div class="card-lbl">Prezračevanje</div>
+      <div class="chips">${chipsHTML('prezracevanje',['Naravno','Mehansko','Klimatizacija','Ni'])}</div>
+    </div>`;
+
+  return '';
+}
+
+// ═══════════════════════
+
+function stepHTMLSVH(s) {
+  if (s === 'svh_prostori') return renderProstoriSVH();
+  if (s === 'sta_prostori') return renderProstoriStan();
+  if (s === 'pos_prostori') return renderProstoriPos();
+  if (s === 'svh_instalacije' || s === 'sta_instalacije')
+    return '<div class="step-head"><h2>Inštalacije</h2><p>Tlaki, zasteklitev in ogrevanje.</p></div>' + renderInstalacije();
+  if (s === 'pos_instalacije')
+    return '<div class="step-head"><h2>Inštalacije</h2><p>Tlaki, zasteklitev in ogrevanje.</p></div>' + renderInstalacije() +
+      '<div class="card" style="margin-top:8px;"><div class="card-lbl">Prezračevanje</div><div class="chips">' +
+      chipsHTML('prezracevanje',['Naravno','Mehansko','Klimatizacija','Ni']) + '</div></div>';
+  if (s === 'svh_prikljucki' || s === 'pos_prikljucki')
+    return '<div class="step-head"><h2>Priključki</h2><p>Komunalni priključki in parkiranje.</p></div>' + renderPrikljucki();
+  if (s === 'svh_obnove' || s === 'sta_obnove') return renderObnoveStep();
+  if (s === 'svh_zakljucek' || s === 'sta_zakljucek' || s === 'pos_zakljucek') {
+    const cc = function(field) {
+      const v = G[field];
+      const isNum = v && v !== 'ne_prodaja' && v !== 'ne_povejo';
+      return '<div class="cena-row">' +
+        '<button class="chip ' + (v==='ne_prodaja'?'on':'') + '" onclick="setCenaChip(\'' + field + '\',\'ne_prodaja\',this)">Se ne prodaja</button>' +
+        '<button class="chip ' + (v==='ne_povejo'?'on':'') + '" onclick="setCenaChip(\'' + field + '\',\'ne_povejo\',this)">Ne povejo</button>' +
+        '</div><input type="text" inputmode="numeric" placeholder="npr. 285.000" value="' + esc(isNum?v:'') + '" style="margin-top:8px;" oninput="setCenaNum(\'' + field + '\',this)">';
+    };
+    return '<div class="step-head"><h2>Zaključek</h2><p>Cena, dokumentacija in posebnosti.</p></div>' +
+      '<div class="card"><div class="card-lbl">Oglaševana cena</div>' + cc('cena_oglas') + '</div>' +
+      '<div class="card"><div class="card-lbl">Pogodbena cena</div>' + cc('cena_pogodba') + '</div>' +
+      '<div class="card"><div class="card-lbl">Dokumentacija</div><div class="chips">' +
+      chipsHTML('dokumentacija',['Nimajo','Že poslano','Še pošljejo']) + '</div></div>' +
+      '<div class="card"><div class="card-lbl">Posebnosti</div><textarea rows="4" placeholder="npr. razgled..." oninput="G.posebnosti=this.value" style="font-size:14px;">' +
+      esc(G.posebnosti||'') + '</textarea></div>';
+  }
+  // Osnovni podatki
+  const letoFld = '<div class="card-lbl">Leto izgradnje objekta</div><input type="text" inputmode="numeric" id="fLeto" placeholder="npr. 1988" value="' + esc(G.leto_izgradnje) + '" maxlength="4" oninput="G.leto_izgradnje=this.value">';
+  const orientFld = '<div class="divider"></div><div class="card-lbl">Orientacija</div><div class="chips">' +
+    '<button class="chip ' + (G.orient_VSE?'on':'') + '" onclick="togOrient(\'VSE\',this)">Vse smeri</button>' +
+    '<button class="chip ' + (G.orient_S?'on':'') + '" onclick="togOrient(\'S\',this)">S</button>' +
+    '<button class="chip ' + (G.orient_J?'on':'') + '" onclick="togOrient(\'J\',this)">J</button>' +
+    '<button class="chip ' + (G.orient_V?'on':'') + '" onclick="togOrient(\'V\',this)">V</button>' +
+    '<button class="chip ' + (G.orient_Z?'on':'') + '" onclick="togOrient(\'Z\',this)">Z</button>' +
+    '<button class="chip ' + (G.orient_SZ?'on':'') + '" onclick="togOrient(\'SZ\',this)">SZ</button>' +
+    '<button class="chip ' + (G.orient_SV?'on':'') + '" onclick="togOrient(\'SV\',this)">SV</button>' +
+    '<button class="chip ' + (G.orient_JV?'on':'') + '" onclick="togOrient(\'JV\',this)">JV</button>' +
+    '<button class="chip ' + (G.orient_JZ?'on':'') + '" onclick="togOrient(\'JZ\',this)">JZ</button>' +
+    '</div>';
+  if (s === 'svh_vse' || s === 'sta_vse') {
+    const tit = s === 'svh_vse' ? 'Podatki o stanovanju v hiši' : 'Podatki o stanovanju';
+    return '<div class="step-head"><h2>' + tit + '</h2><p>Izpolnite osnovne podatke.</p></div>' +
+      '<div class="card">' + letoFld +
+      '<div class="divider"></div><div class="card-lbl">Vseljena</div><div class="chips">' + chipsHTML('vseljeno',['Da','Ne']) + '</div>' +
+      '<div class="divider"></div><div class="card-lbl">Vzdrževana</div><div class="chips">' + chipsHTML('vzdrzevano',['Da','Ne']) + '</div>' +
+      (s === 'svh_vse' ?
+      '<div class="divider"></div><div class="card-lbl">Število stanovanj v objektu</div><div class="chips">' + chipsHTML('st_stanovanj',['2','3','4','5+']) + '</div>' : '') +
+      '<div class="divider"></div><div class="card-lbl">Nadstropje stanovanja</div><div class="chips">' + chipsHTML('nadstropje',['P','VP','1','2','3','4','5','6','7','8','9','10']) + '</div>' +
+      '<div class="divider"></div><div class="card-lbl">Dvigalo</div><div class="chips">' + chipsHTML('dvigalo',['Da','Ne']) + '</div>' +
+      orientFld + '</div>';
+  }
+  if (s === 'pos_vse') {
+    return '<div class="step-head"><h2>Podatki o poslovnem objektu</h2><p>Izpolnite osnovne podatke.</p></div>' +
+      '<div class="card">' + letoFld.replace('Leto izgradnje objekta','Leto izgradnje') +
+      '<div class="divider"></div><div class="card-lbl">Tip objekta</div><div class="chips">' + chipsHTML('vrsta',['Pisarna','Trgovsko-storitveni','Gostinski lokal','Skladišče','Delavnica','Drugo']) + '</div>' +
+      '<div class="divider"></div><div class="card-lbl">Zaseden</div><div class="chips">' + chipsHTML('vseljeno',['Da','Ne']) + '</div>' +
+      '<div class="divider"></div><div class="card-lbl">Vzdrževan</div><div class="chips">' + chipsHTML('vzdrzevano',['Da','Ne']) + '</div>' +
+      '<div class="divider"></div><div class="card-lbl">Površina (m²)</div>' +
+      '<input type="text" inputmode="numeric" placeholder="npr. 120" value="' + esc(G.povrsina||'') + '" oninput="G.povrsina=this.value">' +
+      '</div>';
+  }
+  return '';
+}
+
+// INTERACTIONS
+// ═══════════════════════
+function selTip(tip, el) {
+  // Preveri naslov PRED prehodom
+  if (!G.naslov.trim()) {
+    const inp = document.getElementById('fNaslov');
+    if (inp) {
+      inp.focus();
+      inp.classList.add('shake');
+      setTimeout(() => inp.classList.remove('shake'), 500);
+    }
+    showValErr('Najprej vnesite naslov nepremičnine.');
+    return;
+  }
+  G.tip = tip;
+  buildSteps();
+  setTimeout(() => { stepIdx=1; if(stepIdx>=steps.length){finishForm();}else{renderStep();} }, 260);
+}
+
+function showValErr(msg) {
+  const el = document.getElementById('valErr');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function setF(field, val, el) {
+  G[field] = val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on','nz'));
+  el.classList.add('on');
+  const inp = el.closest('.chips').querySelector('.chip-input');
+  if (inp) { inp.value = ''; inp.classList.remove('active'); }
+  if (field === 'prikl_vodovod') toggleCondFields('cond-vodovod', val === 'Ne');
+  if (field === 'prikl_kanal')   toggleCondFields('cond-kanal',   val === 'Ne');
+  autoCheck();
+}
+
+// ─── AUTO-ADVANCE ────────────────────────────────────────────────
+
+function togMultiData(el) {
+  const field = el.dataset.field;
+  const val   = el.dataset.val;
+  togMulti(field, val, el);
+}
+
+function setCustom(field, inp) {
+  G[field] = inp.value;
+  inp.classList.toggle('active', inp.value.length > 0);
+  inp.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on','nz'));
+  autoCheck();
+}
+
+function clearChips(field, inp) {
+  inp.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on','nz'));
+}
+
+function stepHTML(s) {
+  if (s === 'naslov_tip') return `
+    <div class="step-head"><h2>Nov ogled</h2><p>Naslov in vrsta nepremičnine.</p></div>
+    <div class="card" id="naslovCard">
+      <div class="card-lbl">Naslov / kraj <span style="color:var(--red);margin-left:4px;">*</span></div>
+      <input type="text" id="fNaslov" placeholder="npr. Vojkova cesta 77, Ljubljana"
+        value="${esc(G.naslov)}"
+        oninput="G.naslov=this.value;clearValErr()"
+        autocomplete="street-address"
+        style="font-size:17px;font-weight:600;">
+      <div class="naslov-hint" id="naslovHint">Vnesite naslov, nato izberite vrsto nepremičnine.</div>
+    </div>
+    <div class="tip-selector">
+      ${[['stanovanje','Stanovanje',''],
+         ['stan_v_hisi','Stanovanje v hiši',''],
+         ['hisa','Hiša',''],
+         ['poslovni','Poslovni objekt','']
+        ].map(([k,l,d]) => `
+        <div class="tip-row ${G.tip===k?'sel':''}" onclick="selTip('${k}',this)">
+          <img class="tip-ico" src="${ICO[k]}" alt="${l}">
+          <div class="tip-text"><div class="tip-name">${l}</div></div>
+          <span class="tip-arr">›</span>
+        </div>`).join('')}
+    </div>`;
+
+  if (s === 'hisa_vse') return `
+    <div class="step-head"><h2>Podatki o hiši</h2><p>Izpolnite podatke o objektu.</p></div>
+    <div class="card">
+
+      <div class="card-lbl">Leto izgradnje</div>
+      <input type="text" inputmode="numeric" id="fLeto"
+        placeholder="npr. 1988"
+        value="${esc(G.leto_izgradnje)}"
+        maxlength="4"
+        oninput="G.leto_izgradnje=this.value">
+
+      <div class="divider"></div>
+
+      <div class="card-lbl">Tip objekta</div>
+      <div class="chips">
+        ${chipsHTML('vrsta',['Samostojna','Dvojček','Vrstna','Atrijska'])}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-lbl">Vseljena</div>
+      <div class="chips">
+        ${chipsHTML('vseljeno',['Da','Ne'])}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-lbl">Vzdrževana</div>
+      <div class="chips">
+        ${chipsHTML('vzdrzevano',['Da','Ne'])}
+      </div>
+
+    </div>
+    <div class="card" style="background:rgba(175,45,55,0.04);border-color:rgba(175,45,55,0.15);">
+      <div class="card-lbl" style="color:var(--red);">Etažnost</div>
+      <p style="font-size:13px;color:var(--gray);line-height:1.6;">
+        Etažnost se <b>samodejno izračuna</b> na podlagi prostorov, ki jih boste izpolnili na naslednji strani.
+        Upoštevajo se tudi neizdelane etaže.
+      </p>
+    </div>`;
+
+  if (s === 'hisa_prostori') {
+    const etaze = [
+      {k:'K',  l:'Klet'},
+      {k:'P',  l:'Pritličje'},
+      {k:'1N', l:'Prvo nadstropje'},
+      {k:'2N', l:'Drugo nadstropje'},
+      {k:'M',  l:'Mansarda'},
+    ];
+    // Prostori po etažah — različni za vsako etažo
+    const prostoriPoEtazi = {
+      K:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+           {k:'tehnicni',l:'Teh. pr.'},{k:'kurilnica',l:'Kuril.'},
+           {k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},
+           {k:'garaza',l:'Garaža'},{k:'stranisce',l:'WC'},
+           {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+           {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+           {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+           {k:'terasa',l:'Terasa'}],
+      P:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+           {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+           {k:'utility',l:'Utility'},{k:'garaza',l:'Garaža'},
+           {k:'stranisce',l:'WC'},{k:'kopalnica',l:'Kopal.'},
+           {k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},
+           {k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},{k:'dnevna',l:'Dnevna'},
+           {k:'galerija',l:'Galer.'},{k:'loza',l:'Loža'},
+           {k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+      '1N': [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+             {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+             {k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+             {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+             {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+             {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+             {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+      '2N': [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+             {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+             {k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+             {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+             {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+             {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+             {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+      M:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+           {k:'tehnicni',l:'Teh. pr.'},{k:'shramba',l:'Shramb.'},
+           {k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+           {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+           {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+           {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+           {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+    };
+    const neizdelanOpcije = ['K','P','1N','2N','M'];
+
+    // Ensure prostori object exists
+    if (!G.prostori) G.prostori = {};
+    if (!G.neizdelano) G.neizdelano = [];
+    etaze.forEach(e => { if (!G.prostori[e.k]) G.prostori[e.k] = {}; });
+
+    const etazeHTML = etaze.map(e => {
+      const ep = G.prostori[e.k] || {};
+      const skupaj = Object.values(ep).reduce((s,n)=>s+(n||0),0);
+      const pList = prostoriPoEtazi[e.k] || [];
+      const drugoDrugo = ep['drugo_text'] || '';
+      const etazaKey = e.k;
+      const gridHTML = pList.map(p => {
+        const n = ep[p.k] || 0;
+        return '<div class="prostor-item ' + (n>0?'active':'') + '" id="pi-' + etazaKey + '-' + p.k + '">' +
+          '<div class="prostor-naziv">' + p.l + '</div>' +
+          '<div class="prostor-ctrl">' +
+            '<button class="prostor-btn minus" onclick="sprProstor(\'' + etazaKey + '\',\'' + p.k + '\',-1)">−</button>' +
+            '<div class="prostor-st" id="ps-' + etazaKey + '-' + p.k + '">' + (n>0?n:'') + '</div>' +
+            '<button class="prostor-btn plus" onclick="sprProstor(\'' + etazaKey + '\',\'' + p.k + '\',1)">+</button>' +
+          '</div></div>';
+      }).join('') +
+      '<div class="prostor-item prostor-drugo" style="grid-column:1/-1;">' +
+        '<div class="prostor-naziv" style="text-align:left;margin-bottom:6px;">Drugo</div>' +
+        '<input type="text" class="chip-input ' + (drugoDrugo?'active':'') + '"' +
+        ' placeholder="Vpiši prostor..."' +
+        ' value="' + esc(drugoDrugo) + '"' +
+        ' style="width:100%;font-size:13px;"' +
+        ' data-etaza="' + etazaKey + '"' +
+        ' oninput="sprDrugo(this.dataset.etaza,this.value)">' +
+      '</div>';
+      return `<div class="etaza-card">
+        <div class="etaza-hdr">
+          <span class="etaza-naziv">${e.l}</span>
+          <span class="etaza-skupaj" id="es-${e.k}">${skupaj>0?skupaj+' prostorov':''}</span>
+        </div>
+        <div class="prostori-grid">${gridHTML}</div>
+      </div>`;
+    }).join('');
+
+    const neizdelanHTML = neizdelanOpcije.map(k => {
+      const on = G.neizdelano.includes(k);
+      return `<button class="neizd-chip ${on?'on':''}" onclick="togNeizd('${k}',this)">${k}</button>`;
+    }).join('') + `<input type="text" class="chip-input ${G.neizd_drugo?'active':''}"
+      placeholder="Drugo..." value="${esc(G.neizd_drugo||'')}"
+      oninput="G.neizd_drugo=this.value"
+      style="height:auto;padding:9px 13px;font-size:13px;width:90px;">`;
+
+    return `
+      <div class="step-head"><h2>Prostori</h2><p>Dodajte prostore po etažah.</p></div>
+      ${etazeHTML}
+      <div class="etaza-card">
+        <div class="etaza-hdr neizd">
+          <span class="etaza-naziv">Neizdelano</span>
+          <span class="etaza-skupaj">Etaže ki niso izdelane</span>
+        </div>
+        <div class="neizd-grid">${neizdelanHTML}</div>
+      </div>
+      <div class="card" style="margin-top:4px;">
+        <div class="card-lbl">Opombe</div>
+        <textarea id="fOpombeProstori" rows="3"
+          placeholder="npr. hiša je med-etažna, ima 5 nadstropij, nestandardna razporeditev..."
+          oninput="G.opombe_prostori=this.value"
+          style="font-size:14px;">${esc(G.opombe_prostori||'')}</textarea>
+      </div>
+    `;
+  }
+
+  if (s === 'hisa_instalacije') {
+    const ogrevaList = ['Ploskovna v talnem razvodu','Radiatorji','IR paneli','Električni grelniki','Konvertorji','Kamin'];
+    const ogrevaChips = ogrevaList.map(v => {
+      const on = (G.ogrevala||[]).includes(v);
+      return '<button class="chip ' + (on?'multi-on':'') + '"' +
+        ' data-val="' + esc(v) + '" onclick="togOgrevaloData(this)">' + v + '</button>';
+    }).join('') +
+    '<input type="text" class="chip-input ' + (G.ogrevala_drugo?'active':'') + '"' +
+    ' placeholder="Drugo..."' +
+    ' value="' + esc(G.ogrevala_drugo||'') + '"' +
+    ' oninput="G.ogrevala_drugo=this.value">';
+
+    return `
+    <div class="step-head"><h2>Inštalacije</h2><p>Tlaki, zasteklitev in ogrevanje.</p></div>
+
+    <div class="card">
+      <div class="card-lbl">Finalni tlaki</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">
+        ${multiChipsHTML('tlaki',['Parket','Vinil','Laminat','Keramika','Tapison','Pluta','Umetna masa','Ladijski pod','Teraco'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Zasteklitev</div>
+      <div class="sekcija-lbl">Tip stekla</div>
+      <div class="chips">
+        ${chipsHTML('zasteklitev_tip',['Starejša','2-slojna','3-slojna'])}
+      </div>
+      <div class="sekcija-lbl" style="margin-top:14px;">Material okvirjev</div>
+      <div class="chips">
+        ${chipsHTML('zasteklitev_okvir',['PVC','ALU','Leseni','PVC/ALU','ALU/Les'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Ogrevanje prostorov</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">
+        ${multiChipsHTML('ogr_prostori',['Daljinska toplota','Toplotna črpalka','Cen. plinska peč','Cen. peč na kurilno olje','Cen. peč na biomaso','Sam. plinska peč','Sam. peč na kurilno olje','Sam. peč na biomaso','El. peč','Klimatska naprava'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Ogrevanje vode (TSV)</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">
+        ${multiChipsHTML('ogr_voda',['Daljinska toplota','Toplotna črpalka','Cen. plinska peč','Cen. peč na kurilno olje','Cen. peč na biomaso','Sam. plinska peč','Sam. peč na kurilno olje','Sam. peč na biomaso','El. peč','El. grelnik'])}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-lbl">Ogrevala</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">${ogrevaChips}</div>
+    </div>`;
+  }
+
+
+  // ── KORAK 4: PRIKLJUČKI ─────────────────────────────────────────
+  if (s === 'hisa_prikljucki') {
+    const daNeChip = (field, label) => {
+      const v = G[field];
+      return '<div class="card-lbl">' + label + '</div>' +
+        '<div class="chips">' +
+        '<button class="chip ' + (v==='Da'?'on':'') + '" onclick="setF(\'' + field + '\',\'Da\',this)">Da</button>' +
+        '<button class="chip ' + (v==='Ne'?'on':'') + '" onclick="setF(\'' + field + '\',\'Ne\',this)">Ne</button>' +
+        '</div>';
+    };
+
+    const vodAlt =
+      '<div class="cond-fields" id="cond-vodovod" style="display:' + (G.prikl_vodovod==='Ne'?'block':'none') + ';">' +
+        '<div class="card-lbl">Alternativni vir vode</div>' +
+        '<div class="chips">' +
+          multiChipsHTML('prikl_vodovod_alt',['Vodnjak','Kapnica','Izvir']) +
+        '</div></div>';
+
+    const kanAlt =
+      '<div class="cond-fields" id="cond-kanal" style="display:' + (G.prikl_kanal==='Ne'?'block':'none') + ';">' +
+        '<div class="card-lbl">Alternativna kanalizacija</div>' +
+        '<div class="chips">' +
+          multiChipsHTML('prikl_kanal_alt',['Greznica','Biološka čistilna naprava']) +
+        '</div></div>';
+
+    const parkHTML =
+      '<div class="card-lbl" style="margin-top:18px;">Parkiranje</div>' +
+      '<p style="font-size:12px;color:var(--gray);margin-bottom:10px;">Izberete lahko več možnosti.</p>' +
+      '<div class="chips">' +
+        multiChipsHTML('prikl_parkiranje',['Garaža v objektu','Garaža ob objektu','Na dvorišču','Pod nadstreškom','Ni urejeno']) +
+      '</div>';
+
+    return `
+      <div class="step-head"><h2>Priključki</h2><p>Komunalni priključki in parkiranje.</p></div>
+      <div class="card">
+        ${daNeChip('prikl_elektrika','Elektrika')}
+        <div class="divider"></div>
+        ${daNeChip('prikl_vodovod','Vodovod')}
+        ${vodAlt}
+        <div class="divider"></div>
+        ${daNeChip('prikl_kanal','Kanalizacija')}
+        ${kanAlt}
+        <div class="divider"></div>
+        ${daNeChip('prikl_plin','Plinovod')}
+        <div class="divider"></div>
+        ${daNeChip('prikl_telekom','Telekomunikacije')}
+        ${parkHTML}
+      </div>`;
+  }
+
+  // ── KORAK 5: OBNOVE ─────────────────────────────────────────────
+  if (s === 'hisa_obnove') {
+    const obnovaList = [
+      {k:'celotna',    l:'V celoti obnovljeno'},
+      {k:'streha',     l:'Streha'},
+      {k:'fasada',     l:'Fasada'},
+      {k:'okna',       l:'Okna'},
+      {k:'vrata_vh',   l:'Vhodna vrata'},
+      {k:'vrata_not',  l:'Notranja vrata'},
+      {k:'tlaki',      l:'Finalni tlaki'},
+      {k:'radiatorji', l:'Radiatorji'},
+      {k:'el_inst',    l:'El. instalacije'},
+      {k:'vod_inst',   l:'Vod. instalacije'},
+      {k:'kopalnica',  l:'Kopalnica'},
+      {k:'stranisce',  l:'Stranišče'},
+      {k:'pec',        l:'Peč za ogrevanje'},
+    ];
+    if (!G.obnove) G.obnove = {};
+    const drugObn = G.obnove['drugo'] || {leto:'', ime:''};
+    const drugRow = renderDrugRow(drugObn.leto?'filled':'', esc(drugObn.leto||''), esc(drugObn.ime||''));
+
+    const niObnovljenoVal = G.obnove['_status'] || '';
+    const statusRow =
+      '<div class="obnova-row" style="border-bottom:2px solid var(--border);margin-bottom:4px;padding-bottom:10px;">' +
+        '<div class="chips" style="flex:1;">' +
+          '<button class="chip ' + (niObnovljenoVal==='ni_obnovljeno'?'on':'') + '" data-sv="ni_obnovljeno" onclick="setObnovaStatus(this.dataset.sv,this)">Ni bilo obnovljeno</button>' +
+          '<button class="chip ' + (niObnovljenoVal==='ni_podatka'?'on':'') + '" data-sv="ni_podatka" onclick="setObnovaStatus(this.dataset.sv,this)">Ni podatka</button>' +
+        '</div>' +
+      '</div>';
+
+    const rowsHTML = statusRow + obnovaList.map(o => {
+      const val = (G.obnove[o.k]||{}).leto || '';
+      return '<div class="obnova-row">' +
+        '<input type="text" inputmode="numeric" maxlength="4"' +
+        ' class="obnova-leto ' + (val?'filled':'') + '"' +
+        ' placeholder="leto"' +
+        ' value="' + esc(val) + '"' +
+        ' data-key="' + o.k + '"' +
+        ' oninput="setObnova(this.dataset.key,this.value)">' +
+        '<div class="obnova-ime">' + o.l + '</div>' +
+      '</div>';
+    }).join('') +
+    drugRow;
+
+    return `
+      <div class="step-head"><h2>Obnove</h2><p>Vpišite letnico obnove kjer je relevantno.</p></div>
+      <div class="card">${rowsHTML}</div>`;
+  }
+
+  // ── KORAK 6: ZAKLJUČEK ──────────────────────────────────────────
+  if (s === 'hisa_zakljucek') {
+    const cenaChips = (field) => {
+      const v = G[field];
+      const isNum = v && v !== 'ne_prodaja' && v !== 'ne_povejo';
+      return '<div class="cena-row">' +
+        '<button class="chip ' + (v==='ne_prodaja'?'on':'') + '" onclick="setCena(\'' + field + '\',\'ne_prodaja\',this)">Se ne prodaja</button>' +
+        '<button class="chip ' + (v==='ne_povejo'?'on':'') + '" onclick="setCena(\'' + field + '\',\'ne_povejo\',this)">Ne povejo</button>' +
+        '</div>' +
+        '<input type="text" inputmode="numeric"' +
+        ' class="' + (isNum?'':'') + '"' +
+        ' placeholder="npr. 285.000 €"' +
+        ' value="' + esc(isNum?v:'') + '"' +
+        ' style="margin-top:8px;"' +
+        ' oninput="setCenaNum(\'' + field + '\',this)">';
+    };
+
+    return `
+      <div class="step-head"><h2>Zaključek</h2><p>Cena, dokumentacija in posebnosti.</p></div>
+
+      <div class="card">
+        <div class="card-lbl">Oglaševana cena</div>
+        ${cenaChips('cena_oglas')}
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">Pogodbena cena</div>
+        ${cenaChips('cena_pogodba')}
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">Dokumentacija</div>
+        <div class="chips">
+          ${chipsHTML('dokumentacija',['Nimajo','Že poslano','Še pošljejo'])}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-lbl">Posebnosti</div>
+        <textarea id="fPosebnosti" rows="4"
+          placeholder="npr. razgled, bližina gozda, posebna arhitektura, pravni zadržki..."
+          oninput="G.posebnosti=this.value"
+          style="font-size:14px;">${esc(G.posebnosti||'')}</textarea>
+      </div>`;
+  }
+
+
+  // SVH, STA, POS
+  if (s === 'svh_vse' || s === 'sta_vse' || s === 'pos_vse' ||
+      s === 'svh_prostori' || s === 'sta_prostori' || s === 'pos_prostori' ||
+      s === 'svh_instalacije' || s === 'sta_instalacije' || s === 'pos_instalacije' ||
+      s === 'svh_prikljucki' || s === 'pos_prikljucki' ||
+      s === 'svh_obnove' || s === 'sta_obnove' ||
+      s === 'svh_zakljucek' || s === 'sta_zakljucek' || s === 'pos_zakljucek') {
+    return stepHTMLSVH(s);
+  }
+
+  return '';
+}
+
+// ═══════════════════════
+// INTERACTIONS
+// ═══════════════════════
+function selTip(tip, el) {
+  // Preveri naslov PRED prehodom
+  if (!G.naslov.trim()) {
+    const inp = document.getElementById('fNaslov');
+    if (inp) {
+      inp.focus();
+      inp.classList.add('shake');
+      setTimeout(() => inp.classList.remove('shake'), 500);
+    }
+    showValErr('Najprej vnesite naslov nepremičnine.');
+    return;
+  }
+  G.tip = tip;
+  buildSteps();
+  setTimeout(() => { stepIdx=1; if(stepIdx>=steps.length){finishForm();}else{renderStep();} }, 260);
+}
+
+function showValErr(msg) {
+  const el = document.getElementById('valErr');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function setF(field, val, el) {
+  G[field] = val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on','nz'));
+  el.classList.add('on');
+  const inp = el.closest('.chips').querySelector('.chip-input');
+  if (inp) { inp.value = ''; inp.classList.remove('active'); }
+  if (field === 'prikl_vodovod') toggleCondFields('cond-vodovod', val === 'Ne');
+  if (field === 'prikl_kanal')   toggleCondFields('cond-kanal',   val === 'Ne');
+  autoCheck();
+}
+
+// ─── AUTO-ADVANCE ────────────────────────────────────────────────
+let autoTimer = null;
+
+function autoCheck() {
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    if (isStepComplete()) {
+      requestAnimationFrame(() => { nextStep(); });
+    }
+  }, 600);
+}
+
+
+// ══════════════════════════════════════════════
+// SKUPNI POMOŽNI RENDERJI
+// ══════════════════════════════════════════════
+
+function renderInstalacije() {
+  const ogrevaList = ['Ploskovna v talnem razvodu','Radiatorji','IR paneli','Električni grelniki','Konvertorji','Kamin'];
+  const ogrevaChips = ogrevaList.map(v => {
+    const on = (G.ogrevala||[]).includes(v);
+    return '<button class="chip ' + (on?'multi-on':'') + '" data-val="' + esc(v) + '" onclick="togOgrevaloData(this)">' + v + '</button>';
+  }).join('') +
+  '<input type="text" class="chip-input ' + (G.ogrevala_drugo?'active':'') + '"' +
+  ' placeholder="Drugo..." value="' + esc(G.ogrevala_drugo||'') + '" oninput="G.ogrevala_drugo=this.value">';
+
+  const tlakiList = ['Parket','Laminat','Keramika','Kamen','Beton','Vinil','Tepih'];
+  const tlakiChips = tlakiList.map(v => {
+    const on = (G.tlaki||[]).includes(v);
+    return '<button class="chip ' + (on?'multi-on':'') + '" data-val="' + esc(v) + '" onclick="togTlakData(this)">' + v + '</button>';
+  }).join('') +
+  '<input type="text" class="chip-input ' + (G.tlaki_drugo?'active':'') + '"' +
+  ' placeholder="Drugo..." value="' + esc(G.tlaki_drugo||'') + '" oninput="G.tlaki_drugo=this.value">';
+
+  const ogrPList = ['Toplotna črpalka','Plin','El. peč','Daljinsko','Kurilno olje','Biomasa'];
+  const ogrPChips = ogrPList.map(v => {
+    const on = (G.ogr_prostori||[]).includes(v);
+    return '<button class="chip ' + (on?'multi-on':'') + '" data-val="' + esc(v) + '" onclick="togOgrProstoriData(this)">' + v + '</button>';
+  }).join('') +
+  '<input type="text" class="chip-input ' + (G.ogr_prostori_drugo?'active':'') + '"' +
+  ' placeholder="Drugo..." value="' + esc(G.ogr_prostori_drugo||'') + '" oninput="G.ogr_prostori_drugo=this.value">';
+
+  const ogrVList = ['Električni grelnik','Toplotna črpalka','Plin','Solarni sistem','Bojler'];
+  const ogrVChips = ogrVList.map(v => {
+    const on = (G.ogr_voda||[]).includes(v);
+    return '<button class="chip ' + (on?'multi-on':'') + '" data-val="' + esc(v) + '" onclick="togOgrVodaData(this)">' + v + '</button>';
+  }).join('') +
+  '<input type="text" class="chip-input ' + (G.ogr_voda_drugo?'active':'') + '"' +
+  ' placeholder="Drugo..." value="' + esc(G.ogr_voda_drugo||'') + '" oninput="G.ogr_voda_drugo=this.value">';
+
+  return `<div class="card">
+      <div class="card-lbl">Finalni tlaki</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">${tlakiChips}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Zasteklitev — steklo</div>
+      <div class="chips">${chipsHTML('zasteklitev_tip',['Starejša','2-slojna','3-slojna'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Zasteklitev — okvirji</div>
+      <div class="chips">${chipsHTML('zasteklitev_okvir',['PVC','ALU','Leseni','PVC/ALU','ALU/Les'])}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Ogrevanje prostorov</div>
+      <div class="chips">${ogrPChips}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Ogrevanje tople vode</div>
+      <div class="chips">${ogrVChips}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Ogrevala</div>
+      <div class="chips">${ogrevaChips}</div>
+    </div>`;
+}
+
+function renderPrikljucki() {
+  const parkList = ['Garaža v objektu','Garaža ob objektu','Na dvorišču','Pod nadstreškom','Ni urejeno'];
+  const parkChips = parkList.map(v => {
+    const on = (G.prikl_parkiranje||[]).includes(v);
+    return '<button class="chip ' + (on?'multi-on':'') + '" data-val="' + esc(v) + '" onclick="togParkData(this)">' + v + '</button>';
+  }).join('');
+
+  function pBtn(field, label) {
+    const v = G[field];
+    return `<div class="card-lbl">${label}</div>
+      <div class="chips">
+        <button class="chip ${v==='Da'?'on':''}" onclick="setF('${field}','Da',this)">Da</button>
+        <button class="chip ${v==='Ne'?'on':''}" onclick="setF('${field}','Ne',this)">Ne</button>
+      </div>`;
+  }
+
+  return `<div class="card">
+      ${pBtn('prikl_elektrika','Elektrika')}
+      <div class="divider"></div>
+      ${pBtn('prikl_vodovod','Vodovod')}
+      <div class="cond-fields" id="cfVodovod" style="display:${G.prikl_vodovod==='Ne'?'block':'none'}">
+        <div class="card-lbl">Vir vode</div>
+        <div class="chips">
+          ${['Lastni vodnjak','Kapnica','Skupni vodnjak'].map(v=>{
+            const on=(G.prikl_vodovod_alt||[]).includes(v);
+            return '<button class="chip '+(on?'multi-on':'')+'" data-val="'+esc(v)+'" onclick="togVodovodAlt(this)">'+v+'</button>';
+          }).join('')}
+        </div>
+      </div>
+      <div class="divider"></div>
+      ${pBtn('prikl_kanal','Kanalizacija')}
+      <div class="cond-fields" id="cfKanal" style="display:${G.prikl_kanal==='Ne'?'block':'none'}">
+        <div class="card-lbl">Odvodnjavanje</div>
+        <div class="chips">
+          ${['Greznica','Čistilna naprava','Lovilnik maščob'].map(v=>{
+            const on=(G.prikl_kanal_alt||[]).includes(v);
+            return '<button class="chip '+(on?'multi-on':'')+'" data-val="'+esc(v)+'" onclick="togKanalAlt(this)">'+v+'</button>';
+          }).join('')}
+        </div>
+      </div>
+      <div class="divider"></div>
+      ${pBtn('prikl_plin','Plinovod')}
+      <div class="divider"></div>
+      ${pBtn('prikl_telekom','Telekomunikacije')}
+      <div class="divider"></div>
+      <div class="card-lbl">Parkiranje</div>
+      <p style="font-size:12px;color:var(--gray);margin-bottom:12px;">Izberete lahko več možnosti.</p>
+      <div class="chips">${parkChips}</div>
+    </div>`;
+}
+
+function renderObnoveStep() {
+  const obnovaList = [
+    {k:'celotna',    l:'V celoti obnovljeno'},
+    {k:'streha',     l:'Streha'},
+    {k:'fasada',     l:'Fasada'},
+    {k:'okna',       l:'Okna'},
+    {k:'vrata_vh',   l:'Vhodna vrata'},
+    {k:'vrata_not',  l:'Notranja vrata'},
+    {k:'tlaki',      l:'Finalni tlaki'},
+    {k:'radiatorji', l:'Radiatorji'},
+    {k:'el_inst',    l:'El. instalacije'},
+    {k:'vod_inst',   l:'Vod. instalacije'},
+    {k:'kopalnica',  l:'Kopalnica'},
+    {k:'stranisce',  l:'Stranišče'},
+    {k:'pec',        l:'Peč za ogrevanje'},
+  ];
+  if (!G.obnove) G.obnove = {};
+  const drugObn = G.obnove['drugo'] || {leto:'', ime:''};
+  const drugRow = renderDrugRow(drugObn.leto?'filled':'', esc(drugObn.leto||''), esc(drugObn.ime||''));
+  const niObnovljenoVal = G.obnove['_status'] || '';
+  const statusRow =
+    '<div class="obnova-row" style="border-bottom:2px solid var(--border);margin-bottom:4px;padding-bottom:10px;">' +
+      '<div class="chips" style="flex:1;">' +
+        '<button class="chip ' + (niObnovljenoVal==='ni_obnovljeno'?'on':'') + '" data-sv="ni_obnovljeno" onclick="setObnovaStatus(this.dataset.sv,this)">Ni bilo obnovljeno</button>' +
+        '<button class="chip ' + (niObnovljenoVal==='ni_podatka'?'on':'') + '" data-sv="ni_podatka" onclick="setObnovaStatus(this.dataset.sv,this)">Ni podatka</button>' +
+      '</div>' +
+    '</div>';
+  const rowsHTML = statusRow + obnovaList.map(o => {
+    const val = (G.obnove[o.k]||{}).leto || '';
+    return '<div class="obnova-row">' +
+      '<div class="obnova-ime">' + o.l + '</div>' +
+      '<input type="text" inputmode="numeric" maxlength="4"' +
+      ' class="obnova-leto ' + (val?'filled':'') + '"' +
+      ' placeholder="leto" value="' + esc(val) + '"' +
+      ' data-key="' + o.k + '" oninput="setObnova(this.dataset.key,this.value)">' +
+    '</div>';
+  }).join('') + drugRow;
+  return `
+    <div class="step-head"><h2>Obnove</h2><p>Vpišite letnico obnove kjer je relevantno.</p></div>
+    <div class="card">${rowsHTML}</div>`;
+}
+
+function renderZakljucek() {
+  const cenaChips = (field) => {
+    const v = G[field];
+    const isNum = v && v !== 'ne_prodaja' && v !== 'ne_povejo';
+    return '<div class="cena-row">' +
+      '<button class="chip ' + (v==='ne_prodaja'?'on':'') + '" onclick="setCena(\''+field+'\',\'ne_prodaja\',this)">Ne prodaja</button>' +
+      '<button class="chip ' + (v==='ne_povejo'?'on':'') + '" onclick="setCena(\''+field+'\',\'ne_povejo\',this)">Ne povejo</button>' +
+      '</div>' +
+      '<input type="text" inputmode="numeric" placeholder="npr. 150000"' +
+      ' value="' + (isNum?esc(v):'') + '"' +
+      ' oninput="setCena(\''+field+'\',this.value,null)"' +
+      ' style="margin-top:8px;">';
+  };
+  const dokList = ['Urejena','Delno urejena','V urejanju','Še pošljejo','Ni dokumentacije'];
+  return `
+    <div class="step-head"><h2>Zaključek</h2><p>Cena in dokumentacija.</p></div>
+    <div class="card">
+      <div class="card-lbl">Oglaševana cena (€)</div>
+      ${cenaChips('cena_oglas')}
+      <div class="divider"></div>
+      <div class="card-lbl">Pogodbena cena (€)</div>
+      ${cenaChips('cena_pogodba')}
+      <div class="divider"></div>
+      <div class="card-lbl">Dokumentacija</div>
+      <div class="chips">${dokList.map(v=>'<button class="chip '+(G.dokumentacija===v?'on':'')+'" onclick="setF(\'dokumentacija\',\''+v+'\',this)">'+v+'</button>').join('')}</div>
+      <div class="divider"></div>
+      <div class="card-lbl">Posebnosti / opombe</div>
+      <textarea rows="3" placeholder="Morebitne posebnosti, opombe..."
+        oninput="G.posebnosti=this.value"
+        style="font-size:14px;">${esc(G.posebnosti||'')}</textarea>
+    </div>`;
+}
+
+function togOrient(smer, el) {
+  if (smer === 'VSE') {
+    const on = !G.orient_VSE;
+    ['VSE','S','J','V','Z','SZ','SV','JV','JZ'].forEach(k => { G['orient_'+k] = on; });
+    el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.toggle('on', on));
+  } else {
+    G['orient_'+smer] = !G['orient_'+smer];
+    el.classList.toggle('on', G['orient_'+smer]);
+    // Odznači VSE če katerakoli smer ni označena
+    const allOn = ['S','J','V','Z','SZ','SV','JV','JZ'].every(k => G['orient_'+k]);
+    G.orient_VSE = allOn;
+    const vseBtn = el.closest('.chips').querySelector('.chip:first-child');
+    if (vseBtn) vseBtn.classList.toggle('on', allOn);
+  }
+}
+
+function togTlakData(el) {
+  if (!G.tlaki) G.tlaki = [];
+  const v = el.dataset.val;
+  const i = G.tlaki.indexOf(v);
+  if (i > -1) { G.tlaki.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.tlaki.push(v);    el.classList.add('multi-on'); }
+  autoCheck();
+}
+
+function togOgrProstoriData(el) {
+  if (!G.ogr_prostori) G.ogr_prostori = [];
+  const v = el.dataset.val;
+  const i = G.ogr_prostori.indexOf(v);
+  if (i > -1) { G.ogr_prostori.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.ogr_prostori.push(v);    el.classList.add('multi-on'); }
+  autoCheck();
+}
+
+function togOgrVodaData(el) {
+  if (!G.ogr_voda) G.ogr_voda = [];
+  const v = el.dataset.val;
+  const i = G.ogr_voda.indexOf(v);
+  if (i > -1) { G.ogr_voda.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.ogr_voda.push(v);    el.classList.add('multi-on'); }
+  autoCheck();
+}
+
+function togParkData(el) {
+  if (!G.prikl_parkiranje) G.prikl_parkiranje = [];
+  const v = el.dataset.val;
+  const i = G.prikl_parkiranje.indexOf(v);
+  if (i > -1) { G.prikl_parkiranje.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.prikl_parkiranje.push(v);    el.classList.add('multi-on'); }
+}
+
+function togVodovodAlt(el) {
+  if (!G.prikl_vodovod_alt) G.prikl_vodovod_alt = [];
+  const v = el.dataset.val;
+  const i = G.prikl_vodovod_alt.indexOf(v);
+  if (i > -1) { G.prikl_vodovod_alt.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.prikl_vodovod_alt.push(v);    el.classList.add('multi-on'); }
+}
+
+function togKanalAlt(el) {
+  if (!G.prikl_kanal_alt) G.prikl_kanal_alt = [];
+  const v = el.dataset.val;
+  const i = G.prikl_kanal_alt.indexOf(v);
+  if (i > -1) { G.prikl_kanal_alt.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.prikl_kanal_alt.push(v);    el.classList.add('multi-on'); }
+}
+
+function setCena(field, val, el) {
+  if (el) {
+    el.closest('.card').querySelectorAll('.cena-row .chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    G[field] = val;
+    el.closest('.card').querySelectorAll('input[type=text]').forEach(i => i.value = '');
+  } else {
+    G[field] = val;
+  }
+}
+
+
+
+
+function renderProstoriSVH() {
+  // Stanovanje v hiši — prostori po etažah (kot hiša)
+  const etaze = [
+    {k:'K', l:'Klet'},{k:'P', l:'Pritličje'},
+    {k:'1N', l:'Prvo nadstropje'},{k:'2N', l:'Drugo nadstropje'},{k:'M', l:'Mansarda'},
+  ];
+  const prostoriPoEtazi = {
+    K: [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},{k:'tehnicni',l:'Teh. pr.'},
+        {k:'kurilnica',l:'Kuril.'},{k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},
+        {k:'garaza',l:'Garaža'},{k:'stranisce',l:'WC'},{k:'kopalnica',l:'Kopal.'},
+        {k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},
+        {k:'jedilnica',l:'Jedilnica'},{k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},{k:'terasa',l:'Terasa'}],
+    P: [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},{k:'tehnicni',l:'Teh. pr.'},
+        {k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},{k:'garaza',l:'Garaža'},
+        {k:'stranisce',l:'WC'},{k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},
+        {k:'spalnica',l:'Spaln.'},{k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+        {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},{k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+    '1N':[{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},{k:'tehnicni',l:'Teh. pr.'},
+        {k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+        {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},
+        {k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},{k:'dnevna',l:'Dnevna'},
+        {k:'galerija',l:'Galer.'},{k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+    '2N':[{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},{k:'tehnicni',l:'Teh. pr.'},
+        {k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+        {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},
+        {k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},{k:'dnevna',l:'Dnevna'},
+        {k:'galerija',l:'Galer.'},{k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+    M:  [{k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},{k:'tehnicni',l:'Teh. pr.'},
+        {k:'shramba',l:'Shramb.'},{k:'utility',l:'Utility'},{k:'stranisce',l:'WC'},
+        {k:'kopalnica',l:'Kopal.'},{k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},
+        {k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},{k:'dnevna',l:'Dnevna'},
+        {k:'galerija',l:'Galer.'},{k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},{k:'terasa',l:'Terasa'}],
+  };
+  const neizdelanOpcije = ['K','P','1N','2N','M'];
+  if (!G.prostori) G.prostori = {};
+  if (!G.neizdelano) G.neizdelano = [];
+  etaze.forEach(e => { if (!G.prostori[e.k]) G.prostori[e.k] = {}; });
+
+  const etazeHTML = etaze.map(e => {
+    const ep = G.prostori[e.k] || {};
+    const skupaj = Object.values(ep).reduce((s,n)=>s+(n||0),0);
+    const pList = prostoriPoEtazi[e.k] || [];
+    const drugoDrugo = ep['drugo_text'] || '';
+    const etazaKey = e.k;
+    const gridHTML = pList.map(p => {
+      const n = ep[p.k] || 0;
+      return '<div class="prostor-item ' + (n>0?'active':'') + '" id="pi-' + etazaKey + '-' + p.k + '">' +
+        '<div class="prostor-naziv">' + p.l + '</div>' +
+        '<div class="prostor-ctrl">' +
+          '<button class="prostor-btn minus" onclick="sprProstor(\'' + etazaKey + '\',\'' + p.k + '\',-1)">−</button>' +
+          '<div class="prostor-st" id="ps-' + etazaKey + '-' + p.k + '">' + (n>0?n:'') + '</div>' +
+          '<button class="prostor-btn plus" onclick="sprProstor(\'' + etazaKey + '\',\'' + p.k + '\',1)">+</button>' +
+        '</div></div>';
+    }).join('') +
+    '<div class="prostor-item prostor-drugo" style="grid-column:1/-1;">' +
+      '<div class="prostor-naziv" style="text-align:left;margin-bottom:6px;">Drugo</div>' +
+      '<input type="text" class="chip-input ' + (drugoDrugo?'active':'') + '"' +
+      ' placeholder="Vpiši prostor..." value="' + esc(drugoDrugo) + '"' +
+      ' style="width:100%;font-size:13px;"' +
+      ' data-etaza="' + etazaKey + '"' +
+      ' oninput="sprDrugo(this.dataset.etaza,this.value)">' +
+    '</div>';
+    return '<div class="etaza-card">' +
+      '<div class="etaza-hdr">' +
+        '<span class="etaza-naziv">' + e.l + '</span>' +
+        '<span class="etaza-skupaj" id="es-' + e.k + '">' + (skupaj>0?skupaj+' prostorov':'') + '</span>' +
+      '</div>' +
+      '<div class="prostori-grid">' + gridHTML + '</div>' +
+    '</div>';
+  }).join('');
+
+  const neizdelanHTML = neizdelanOpcije.map(k => {
+    const on = G.neizdelano.includes(k);
+    return '<button class="neizd-chip ' + (on?'on':'') + '" onclick="togNeizd(\'' + k + '\',this)">' + k + '</button>';
+  }).join('') + '<input type="text" class="chip-input ' + (G.neizd_drugo?'active':'') + '"' +
+    ' placeholder="Drugo..." value="' + esc(G.neizd_drugo||'') + '"' +
+    ' oninput="G.neizd_drugo=this.value"' +
+    ' style="height:auto;padding:9px 13px;font-size:13px;width:90px;">';
+
+  return '<div class="step-head"><h2>Prostori</h2><p>Dodajte prostore po etažah.</p></div>' +
+    etazeHTML +
+    '<div class="etaza-card">' +
+      '<div class="etaza-hdr neizd"><span class="etaza-naziv">Neizdelano</span>' +
+        '<span class="etaza-skupaj">Etaže ki niso izdelane</span></div>' +
+      '<div class="neizd-grid">' + neizdelanHTML + '</div>' +
+    '</div>' +
+    '<div class="card" style="margin-top:4px;">' +
+      '<div class="card-lbl">Opombe</div>' +
+      '<textarea rows="3" placeholder="npr. nestandardna razporeditev..."' +
+        ' oninput="G.opombe_prostori=this.value"' +
+        ' style="font-size:14px;">' + esc(G.opombe_prostori||'') + '</textarea>' +
+    '</div>';
+}
+
+function renderProstoriStan() {
+  const pList = [
+    {k:'predprostor',l:'Predpr.'},{k:'hodnik',l:'Hodnik'},
+    {k:'stranisce',l:'WC'},{k:'kopalnica',l:'Kopal.'},
+    {k:'soba',l:'Soba'},{k:'spalnica',l:'Spaln.'},
+    {k:'kuhinja',l:'Kuhinja'},{k:'jedilnica',l:'Jedilnica'},
+    {k:'dnevna',l:'Dnevna'},{k:'galerija',l:'Galer.'},
+    {k:'loza',l:'Loža'},{k:'balkon',l:'Balkon'},
+    {k:'terasa',l:'Terasa'},{k:'shramba',l:'Shramb.'},
+  ];
+  if (!G.prostori) G.prostori = {};
+  if (!G.prostori['STA']) G.prostori['STA'] = {};
+  const ep = G.prostori['STA'] || {};
+  const drugoDrugo = ep['drugo_text'] || '';
+  const skupaj = Object.entries(ep).filter(([k,n])=>k!=='drugo_text'&&n>0).reduce((s,[,n])=>s+n,0);
+  const gridHTML = pList.map(p => {
+    const n = ep[p.k] || 0;
+    return '<div class="prostor-item ' + (n>0?'active':'') + '" id="pi-STA-' + p.k + '">' +
+      '<div class="prostor-naziv">' + p.l + '</div>' +
+      '<div class="prostor-ctrl">' +
+        '<button class="prostor-btn minus" onclick="sprProstor(\'STA\',\''+p.k+'\' ,-1)">−</button>' +
+        '<div class="prostor-st" id="ps-STA-'+p.k+'">'+(n>0?n:'')+'</div>' +
+        '<button class="prostor-btn plus" onclick="sprProstor(\'STA\',\''+p.k+'\',1)">+</button>' +
+      '</div></div>';
+  }).join('') +
+  '<div class="prostor-item prostor-drugo" style="grid-column:1/-1;">' +
+    '<div class="prostor-naziv" style="text-align:left;margin-bottom:6px;">Drugo</div>' +
+    '<input type="text" class="chip-input ' + (drugoDrugo?'active':'') + '"' +
+    ' placeholder="Vpiši prostor..." value="' + esc(drugoDrugo) + '"' +
+    ' style="width:100%;font-size:13px;" oninput="sprDrugo(\'STA\',this.value)">' +
+  '</div>';
+  return `
+    <div class="step-head"><h2>Prostori</h2><p>Dodajte prostore stanovanja.</p></div>
+    <div class="etaza-card">
+      <div class="etaza-hdr"><span class="etaza-naziv">Stanovanje</span>
+        <span class="etaza-skupaj" id="es-STA">${skupaj>0?skupaj+' prostorov':''}</span></div>
+      <div class="prostori-grid">${gridHTML}</div>
+    </div>
+    <div class="card" style="margin-top:4px;">
+      <div class="card-lbl">Opombe</div>
+      <textarea rows="3" placeholder="npr. nestandardna razporeditev..."
+        oninput="G.opombe_prostori=this.value"
+        style="font-size:14px;">${esc(G.opombe_prostori||'')}</textarea>
+    </div>`;
+}
+
+function renderProstoriPos() {
+  const pList = [
+    {k:'pisarna',l:'Pisarna'},{k:'hodnik',l:'Hodnik'},
+    {k:'stranisce',l:'WC'},{k:'kopalnica',l:'Kopal.'},
+    {k:'shramba',l:'Shramb.'},{k:'garaza',l:'Garaža'},
+    {k:'sejna',l:'Sejna'},{k:'recepcija',l:'Recepcija'},
+    {k:'arhiv',l:'Arhiv'},{k:'kuhinja',l:'Kuhinja'},
+    {k:'skladisce',l:'Sklad.'},{k:'tehnicni',l:'Teh. pr.'},
+  ];
+  if (!G.prostori) G.prostori = {};
+  if (!G.prostori['POS']) G.prostori['POS'] = {};
+  const ep = G.prostori['POS'] || {};
+  const drugoDrugo = ep['drugo_text'] || '';
+  const skupaj = Object.entries(ep).filter(([k,n])=>k!=='drugo_text'&&n>0).reduce((s,[,n])=>s+n,0);
+  const gridHTML = pList.map(p => {
+    const n = ep[p.k] || 0;
+    return '<div class="prostor-item ' + (n>0?'active':'') + '" id="pi-POS-' + p.k + '">' +
+      '<div class="prostor-naziv">' + p.l + '</div>' +
+      '<div class="prostor-ctrl">' +
+        '<button class="prostor-btn minus" onclick="sprProstor(\'POS\',\''+p.k+'\' ,-1)">−</button>' +
+        '<div class="prostor-st" id="ps-POS-'+p.k+'">'+(n>0?n:'')+'</div>' +
+        '<button class="prostor-btn plus" onclick="sprProstor(\'POS\',\''+p.k+'\',1)">+</button>' +
+      '</div></div>';
+  }).join('') +
+  '<div class="prostor-item prostor-drugo" style="grid-column:1/-1;">' +
+    '<div class="prostor-naziv" style="text-align:left;margin-bottom:6px;">Drugo</div>' +
+    '<input type="text" class="chip-input ' + (drugoDrugo?'active':'') + '"' +
+    ' placeholder="Vpiši prostor..." value="' + esc(drugoDrugo) + '"' +
+    ' style="width:100%;font-size:13px;" oninput="sprDrugo(\'POS\',this.value)">' +
+  '</div>';
+  return `
+    <div class="step-head"><h2>Prostori</h2><p>Dodajte prostore objekta.</p></div>
+    <div class="etaza-card">
+      <div class="etaza-hdr"><span class="etaza-naziv">Prostori</span>
+        <span class="etaza-skupaj" id="es-POS">${skupaj>0?skupaj+' prostorov':''}</span></div>
+      <div class="prostori-grid">${gridHTML}</div>
+    </div>`;
+}
+
+function setCenaChip(field, val, el) {
+  G[field] = val;
+  // Počisti input in označi chip
+  const card = el.closest('.card');
+  card.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const inp = card.querySelector('input[type=text]');
+  if (inp) inp.value = '';
+}
+
+
+function isStepComplete() {
+  const s = steps[stepIdx];
+
+  if (s === 'hisa_vse') {
+    if (!G.vrsta || !G.vseljeno) return false;
+    const leto = parseInt(G.leto_izgradnje);
+    const novogradnja = !isNaN(leto) && leto >= 2010;
+    if (!novogradnja && !G.vzdrzevano) return false;
+    // Also need leto_izgradnje filled
+    if (!G.leto_izgradnje) return false;
+    return true;
+  }
+
+  if (s === 'hisa_instalacije') {
+    const hasTlaki = (G.tlaki && G.tlaki.length) || G.tlaki_drugo;
+    if (!hasTlaki) return false;
+    if (!G.zasteklitev_tip || !G.zasteklitev_okvir) return false;
+    if ((!G.ogr_prostori || !G.ogr_prostori.length) && !G.ogr_prostori_drugo) return false;
+    if ((!G.ogr_voda || !G.ogr_voda.length) && !G.ogr_voda_drugo) return false;
+    if ((!G.ogrevala || !G.ogrevala.length) && !G.ogrevala_drugo) return false;
+    return true;
+  }
+
+  if (s === 'hisa_prikljucki') {
+    return !!(G.prikl_elektrika && G.prikl_vodovod && G.prikl_kanal &&
+              G.prikl_plin && G.prikl_telekom);
+  }
+
+  if (s === 'hisa_prostori' || s === 'svh_prostori') {
+    return false; // manual only
+  }
+
+  if (s === 'hisa_zakljucek') {
+    return !!(G.cena_oglas && G.cena_pogodba && G.dokumentacija);
+  }
+
+  // Stanovanje v hiši
+  // Stanovanje v hiši
+  if (s === 'svh_vse') {
+    if (!G.leto_izgradnje || !G.vseljeno || !G.nadstropje || !G.dvigalo || !G.st_stanovanj) return false;
+    const letoSVH = parseInt(G.leto_izgradnje);
+    if (!isNaN(letoSVH) && letoSVH < 2010 && !G.vzdrzevano) return false;
+    return true;
+  }
+  if (s === 'svh_instalacije' || s === 'sta_instalacije') {
+    if ((!G.tlaki||!G.tlaki.length) && !G.tlaki_drugo) return false;
+    if (!G.zasteklitev_tip || !G.zasteklitev_okvir) return false;
+    if ((!G.ogr_prostori||!G.ogr_prostori.length) && !G.ogr_prostori_drugo) return false;
+    if ((!G.ogr_voda||!G.ogr_voda.length) && !G.ogr_voda_drugo) return false;
+    if ((!G.ogrevala||!G.ogrevala.length) && !G.ogrevala_drugo) return false;
+    return true;
+  }
+  if (s === 'svh_prikljucki' || s === 'pos_prikljucki') {
+    return !!(G.prikl_elektrika && G.prikl_vodovod && G.prikl_kanal && G.prikl_plin && G.prikl_telekom);
+  }
+  if (s === 'svh_zakljucek' || s === 'sta_zakljucek' || s === 'pos_zakljucek') {
+    return !!(G.cena_oglas && G.cena_pogodba && G.dokumentacija);
+  }
+
+  // Stanovanje
+  // Stanovanje
+  if (s === 'sta_vse') {
+    if (!G.leto_izgradnje || !G.vseljeno || !G.nadstropje || !G.dvigalo) return false;
+    const letoSTA = parseInt(G.leto_izgradnje);
+    if (!isNaN(letoSTA) && letoSTA < 2010 && !G.vzdrzevano) return false;
+    return true;
+  }
+
+  // Poslovni
+  if (s === 'pos_vse') {
+    return !!(G.vrsta && G.vseljeno && G.vzdrzevano);
+  }
+
+  return false;
+}
+
+function toggleCondFields(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+
+function sprDrugo(etaza, val) {
+  if (!G.prostori) G.prostori = {};
+  if (!G.prostori[etaza]) G.prostori[etaza] = {};
+  if (val.trim()) G.prostori[etaza]['drugo_text'] = val;
+  else delete G.prostori[etaza]['drugo_text'];
+  G.etaznost = izracunajEtaznost();
+}
+
+function sprProstor(etaza, prostor, delta) {
+  if (!G.prostori) G.prostori = {};
+  if (!G.prostori[etaza]) G.prostori[etaza] = {};
+
+  // Pravilo: 2N zahteva vsaj 1 prostor v 1N
+  if (etaza === '2N' && delta > 0) {
+    const skupaj1N = Object.values(G.prostori['1N'] || {}).reduce((s,n)=>s+(n||0),0);
+    if (skupaj1N === 0) {
+      toast('Najprej označite prostore v 1. nadstropju!');
+      return;
+    }
+  }
+
+  const curr = G.prostori[etaza][prostor] || 0;
+  const novo = Math.max(0, curr + delta);
+  if (novo === 0) delete G.prostori[etaza][prostor];
+  else G.prostori[etaza][prostor] = novo;
+
+  // Update UI
+  const stEl = document.getElementById('ps-' + etaza + '-' + prostor);
+  const piEl = document.getElementById('pi-' + etaza + '-' + prostor);
+  if (stEl) stEl.textContent = novo > 0 ? novo : '';
+  if (piEl) piEl.classList.toggle('active', novo > 0);
+
+  // Update etaža skupaj
+  const skupaj = Object.values(G.prostori[etaza]).reduce((s,n)=>s+(n||0),0);
+  const esEl = document.getElementById('es-' + etaza);
+  if (esEl) esEl.textContent = skupaj > 0 ? skupaj + ' prostorov' : '';
+
+  // Auto-calculate etaznost
+  G.etaznost = izracunajEtaznost();
+}
+
+function togOgrevaloData(el) { togOgrevalo(el.dataset.val, el); }
+
+function togOgrevalo(val, el) {
+  if (!G.ogrevala) G.ogrevala = [];
+  const i = G.ogrevala.indexOf(val);
+  if (i > -1) { G.ogrevala.splice(i,1); el.classList.remove('multi-on'); }
+  else         { G.ogrevala.push(val);  el.classList.add('multi-on'); }
+  autoCheck();
+}
+
+function togNeizd(k, el) {
+  if (!G.neizdelano) G.neizdelano = [];
+  const i = G.neizdelano.indexOf(k);
+  if (i > -1) { G.neizdelano.splice(i,1); el.classList.remove('on'); }
+  else        { G.neizdelano.push(k);     el.classList.add('on'); }
+  G.etaznost = izracunajEtaznost();
+}
+
+function izracunajEtaznost() {
+  if (!G.prostori) return '';
+  // Etaže ki imajo vsaj 1 prostor ALI so označene kot neizdelane
+  const redVrstni = ['K','P','1N','2N','M'];
+  const imaProstorov = k => Object.values(G.prostori[k]||{}).reduce((s,n)=>s+(n||0),0) > 0;
+  const jeNeizdelana = k => (G.neizdelano||[]).includes(k);
+  const aktivne = redVrstni.filter(k => imaProstorov(k) || jeNeizdelana(k));
+  if (!aktivne.length) return '';
+
+  // Build etaznost string
+  const map = {'K':'K','P':'P','1N':'P+1','2N':'P+2','M':'M'};
+  // Smart combination
+  const hasK  = aktivne.includes('K');
+  const hasP  = aktivne.includes('P');
+  const has1N = aktivne.includes('1N');
+  const has2N = aktivne.includes('2N');
+  const hasM  = aktivne.includes('M');
+
+  let parts = [];
+  if (hasK)  parts.push('K');
+  if (hasP)  parts.push('P');
+  if (has1N) parts.push('1');
+  if (has2N) parts.push('2');
+  if (hasM)  parts.push('M');
+
+  // Standard notation
+  if (parts.length === 0) return '';
+  if (parts.join('+') === 'P') return 'P';
+  if (parts.join('+') === 'K+P') return 'K+P';
+  if (parts.join('+') === 'P+M') return 'P+M';
+  if (parts.join('+') === 'P+1') return 'P+1';
+  if (parts.join('+') === 'P+1+M') return 'P+1+M';
+  if (parts.join('+') === 'K+P+1') return 'K+P+1';
+  if (parts.join('+') === 'K+P+1+M') return 'K+P+1+M';
+  if (parts.join('+') === 'P+1+2') return 'P+2';
+  if (parts.join('+') === 'P+1+2+M') return 'P+2+M';
+  if (parts.join('+') === 'K+P+1+2') return 'K+P+2';
+  if (parts.join('+') === 'K+P+1+2+M') return 'K+P+2+M';
+  return parts.join('+');
+}
+
+// ═══════════════════════
+// NAVIGATION
+// ═══════════════════════
+function validate() {
+  const s = steps[stepIdx];
+  const err = m => {
+    const el = document.getElementById('valErr');
+    el.textContent = m; el.classList.add('show');
+    el.scrollIntoView({behavior:'smooth', block:'nearest'});
+    return false;
+  };
+
+  if (s === 'naslov_tip') {
+    if (!G.naslov.trim()) return err('Vnesite naslov nepremičnine.');
+    if (!G.tip)           return err('Izberite vrsto nepremičnine.');
+  } else if (s === 'hisa_vse') {
+    if (!G.vrsta)    return err('Izberite tip objekta.');
+    if (!G.vseljeno) return err('Izberite ali je hiša vseljena.');
+    const leto = parseInt(G.leto_izgradnje);
+    const novogradnja = !isNaN(leto) && leto >= 2010;
+    if (!novogradnja && !G.vzdrzevano) return err('Izberite vzdrževanost hiše.');
+  } else if (s === 'hisa_instalacije') {
+    if ((!G.tlaki || !G.tlaki.length) && !G.tlaki_drugo)
+      return err('Izberite vsaj en tip finalnih tlakov.');
+    if (!G.zasteklitev_tip)   return err('Izberite tip zasteklitve (steklo).');
+    if (!G.zasteklitev_okvir) return err('Izberite tip zasteklitve (okvirji).');
+    if ((!G.ogr_prostori || !G.ogr_prostori.length) && !G.ogr_prostori_drugo)
+      return err('Izberite ogrevanje prostorov.');
+    if ((!G.ogr_voda || !G.ogr_voda.length) && !G.ogr_voda_drugo)
+      return err('Izberite ogrevanje vode (TSV).');
+    if ((!G.ogrevala || !G.ogrevala.length) && !G.ogrevala_drugo)
+      return err('Izberite ogrevala.');
+  } else if (s === 'hisa_prikljucki') {
+    if (!G.prikl_elektrika) return err('Izberite status električne priključitve.');
+    if (!G.prikl_vodovod)   return err('Izberite status vodovoda.');
+    if (!G.prikl_kanal)     return err('Izberite status kanalizacije.');
+    if (!G.prikl_plin)      return err('Izberite status plinovoda.');
+    if (!G.prikl_telekom)   return err('Izberite status telekomunikacij.');
+  } else if (s === 'hisa_obnove') {
+    const status = (G.obnove||{})['_status'];
+    if (!status) {
+      const hasAnyLeto = Object.entries(G.obnove||{}).some(([k,v]) => k !== '_status' && v && v.leto);
+      if (!hasAnyLeto) return err('Izberite "Ni bilo obnovljeno", "Ni podatka" ali vpišite vsaj eno letnico obnove.');
+    }
+  } else if (s === 'hisa_prostori') {
+    const hasAny = ['K','P','1N','2N','M'].some(e => {
+      const ep = (G.prostori||{})[e] || {};
+      return Object.values(ep).some(n => n > 0);
+    });
+    if (!hasAny) return err('Izpolnite vsaj eno etažo s prostori.');
+  } else if (s === 'hisa_zakljucek') {
+    if (!G.cena_oglas)    return err('Vnesite oglaševalno ceno ali izberite ustrezno možnost.');
+    if (!G.cena_pogodba)  return err('Vnesite pogodbeno ceno ali izberite ustrezno možnost.');
+    if (!G.dokumentacija) return err('Izberite status dokumentacije.');
+
+  } else if (s === 'svh_vse') {
+    if (!G.leto_izgradnje) return err('Vnesite leto izgradnje.');
+    if (!G.vseljeno)       return err('Izberite ali je stanovanje vseljeno.');
+    if (!G.nadstropje)     return err('Izberite nadstropje stanovanja.');
+    if (!G.dvigalo)        return err('Izberite ali ima objekt dvigalo.');
+    if (!G.st_stanovanj)   return err('Izberite število stanovanj v objektu.');
+    const letoSVHv = parseInt(G.leto_izgradnje);
+    if (!isNaN(letoSVHv) && letoSVHv < 2010 && !G.vzdrzevano) return err('Izberite vzdrževanost stanovanja.');
+
+  } else if (s === 'sta_vse') {
+    if (!G.leto_izgradnje) return err('Vnesite leto izgradnje.');
+    if (!G.vseljeno)       return err('Izberite ali je stanovanje vseljeno.');
+    if (!G.nadstropje)     return err('Izberite nadstropje stanovanja.');
+    if (!G.dvigalo)        return err('Izberite ali ima objekt dvigalo.');
+    const letoSTAv = parseInt(G.leto_izgradnje);
+    if (!isNaN(letoSTAv) && letoSTAv < 2010 && !G.vzdrzevano) return err('Izberite vzdrževanost stanovanja.');
+  } else if (s === 'sta_prostori') {
+    const ep = (G.prostori||{})['STA'] || {};
+    const hasAny = Object.entries(ep).some(([k,n]) => k !== 'drugo_text' && n > 0);
+    const hasDrugo = ep['drugo_text'] && ep['drugo_text'].trim();
+    if (!hasAny && !hasDrugo) return err('Izpolnite vsaj en prostor.');
+  } else if (s === 'svh_prostori') {
+    const hasAnySVH = ['K','P','1N','2N','M'].some(e => {
+      const ep2 = (G.prostori||{})[e] || {};
+      return Object.values(ep2).some(n => n > 0);
+    });
+    if (!hasAnySVH) return err('Izpolnite vsaj eno etažo s prostori.');
+
+  } else if (s === 'svh_instalacije' || s === 'sta_instalacije') {
+    if ((!G.tlaki||!G.tlaki.length) && !G.tlaki_drugo) return err('Izberite vsaj en tip finalnih tlakov.');
+    if (!G.zasteklitev_tip)   return err('Izberite tip zasteklitve (steklo).');
+    if (!G.zasteklitev_okvir) return err('Izberite tip zasteklitve (okvirji).');
+    if ((!G.ogr_prostori||!G.ogr_prostori.length) && !G.ogr_prostori_drugo) return err('Izberite ogrevanje prostorov.');
+    if ((!G.ogr_voda||!G.ogr_voda.length) && !G.ogr_voda_drugo) return err('Izberite ogrevanje vode (TSV).');
+    if ((!G.ogrevala||!G.ogrevala.length) && !G.ogrevala_drugo) return err('Izberite ogrevala.');
+
+  } else if (s === 'svh_prikljucki' || s === 'pos_prikljucki') {
+    if (!G.prikl_elektrika) return err('Izberite status električne priključitve.');
+    if (!G.prikl_vodovod)   return err('Izberite status vodovoda.');
+    if (!G.prikl_kanal)     return err('Izberite status kanalizacije.');
+    if (!G.prikl_plin)      return err('Izberite status plinovoda.');
+    if (!G.prikl_telekom)   return err('Izberite status telekomunikacij.');
+
+  } else if (s === 'svh_obnove' || s === 'sta_obnove') {
+    const status = (G.obnove||{})['_status'];
+    if (!status) {
+      const hasAnyLeto = Object.entries(G.obnove||{}).some(([k,v]) => k !== '_status' && v && v.leto);
+      if (!hasAnyLeto) return err('Izberite "Ni bilo obnovljeno", "Ni podatka" ali vpišite vsaj eno letnico.');
+    }
+
+  } else if (s === 'svh_zakljucek' || s === 'sta_zakljucek' || s === 'pos_zakljucek') {
+    if (!G.cena_oglas)    return err('Vnesite oglaševalno ceno ali izberite ustrezno možnost.');
+    if (!G.cena_pogodba)  return err('Vnesite pogodbeno ceno ali izberite ustrezno možnost.');
+    if (!G.dokumentacija) return err('Izberite status dokumentacije.');
+
+  } else if (s === 'pos_vse') {
+    if (!G.vrsta)     return err('Izberite tip poslovnega objekta.');
+    if (!G.vseljeno)  return err('Izberite ali je objekt zaseden.');
+    if (!G.vzdrzevano) return err('Izberite vzdrževanost objekta.');
+
+  } else if (s === 'pos_prostori') {
+    const ep = (G.prostori||{})['POS'] || {};
+    const hasAny = Object.entries(ep).some(([k,n]) => k !== 'drugo_text' && n > 0);
+    const hasDrugo = ep['drugo_text'] && ep['drugo_text'].trim();
+    if (!hasAny && !hasDrugo) return err('Izpolnite vsaj en prostor.');
+  }
+
+  return true;
+}
+
+function nextStep() {
+  if(!validate()) return;
+  db.shrani(G);
+  showSaved();
+  if(stepIdx>=steps.length-1){finishForm();return;}
+  stepIdx++; renderStep(); window.scrollTo(0,0);
+}
+
+function showSaved() {
+  const btn = document.getElementById('btnFwd');
+  const orig = btn.textContent;
+  btn.textContent = '✓ Shranjeno';
+  btn.style.background = '#2a7a4b';
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.background = '';
+  }, 800);
+}
+
+function prevStep() {
+  if(stepIdx>0){stepIdx--;renderStep();window.scrollTo(0,0);}
+  else showList();
+}
+
+function finishForm() {
+  db.shrani(G);
+  // Opis
+  const opisEl = document.getElementById('opisText');
+  opisEl.innerText = genOpis(G);
+  opisEl.dataset.original = opisEl.innerText;
+  // Povzetek
+  renderSummary();
+  showPage('pageOpis');
+}
+
+function resetOpis() {
+  const el = document.getElementById('opisText');
+  if (el.dataset.original) {
+    el.innerText = el.dataset.original;
+    toast('Opis ponastavljen.');
+  }
+}
+
+function renderSummary() {
+  const rows = [];
+  if (G.naslov)          rows.push(['Naslov', G.naslov]);
+  if (G.tip)             rows.push(['Vrsta', tipL(G.tip)]);
+  if (G.vrsta)           rows.push(['Tip objekta', G.vrsta]);
+  if (G.leto_izgradnje)  rows.push(['Leto izgradnje', G.leto_izgradnje]);
+  if (G.vseljeno)        rows.push(['Vseljena', G.vseljeno]);
+  if (G.vzdrzevano)      rows.push(['Vzdrževana', G.vzdrzevano]);
+
+  // Etažnost + prostori
+  if (G.etaznost) rows.push(['Etažnost', G.etaznost]);
+  if (G.nadstropje) rows.push(['Nadstropje', G.nadstropje]);
+  const orientSmeri = [];
+  if (G.orient_S) orientSmeri.push('S');
+  if (G.orient_J) orientSmeri.push('J');
+  if (G.orient_V) orientSmeri.push('V');
+  if (G.orient_Z) orientSmeri.push('Z');
+  if (orientSmeri.length) rows.push(['Orientacija', orientSmeri.join(', ')]);
+  if (G.dvigalo) rows.push(['Dvigalo', G.dvigalo]);
+  if (G.st_stanovanj) rows.push(['Štev. enot', G.st_stanovanj]);
+
+  const PROS_IME2 = {
+    predprostor:'predprostor', hodnik:'hodnik', tehnicni:'teh. prostor',
+    kurilnica:'kurilnica', shramba:'shramba', utility:'utility', garaza:'garaža',
+    stranisce:'stranišče', kopalnica:'kopalnica', soba:'soba', spalnica:'spalnica',
+    kuhinja:'kuhinja', jedilnica:'jedilnica', dnevna:'dnevna soba', galerija:'galerija',
+    loza:'loža', balkon:'balkon', terasa:'terasa',
+    pisarna:'pisarna', sejna:'sejna soba', recepcija:'recepcija', arhiv:'arhiv',
+    skladisce:'skladišče',
+  };
+  // Prostori po etažah (hiša, svh)
+  if (G.prostori && (G.tip === 'hisa' || G.tip === 'stan_v_hisi')) {
+    const ETAZ_L = {K:'K', P:'P', '1N':'1N', '2N':'2N', M:'M'};
+    ['K','P','1N','2N','M'].forEach(function(e) {
+      const ep = G.prostori[e] || {};
+      const jeNeizd = (G.neizdelano||[]).includes(e);
+      if (jeNeizd) { rows.push([ETAZ_L[e], 'neizdelano']); return; }
+      const seznam = [];
+      Object.entries(ep).forEach(function(kv) {
+        const k = kv[0], n = kv[1];
+        if (!n || k === 'drugo_text') return;
+        seznam.push(n > 1 ? n + 'x ' + (PROS_IME2[k]||k) : (PROS_IME2[k]||k));
+      });
+      if (ep['drugo_text']) seznam.push(ep['drugo_text']);
+      if (seznam.length) rows.push([ETAZ_L[e], seznam.join(', ')]);
+    });
+  }
+  // Prostori flat (stanovanje)
+  if (G.prostori && G.tip === 'stanovanje') {
+    const epSTA = G.prostori['STA'] || {};
+    const seznamSTA = [];
+    Object.entries(epSTA).forEach(function(kv) {
+      const k = kv[0], n = kv[1];
+      if (!n || k === 'drugo_text') return;
+      seznamSTA.push(n > 1 ? n + 'x ' + (PROS_IME2[k]||k) : (PROS_IME2[k]||k));
+    });
+    if (epSTA['drugo_text']) seznamSTA.push(epSTA['drugo_text']);
+    if (seznamSTA.length) rows.push(['Prostori', seznamSTA.join(', ')]);
+  }
+  // Prostori poslovni
+  if (G.prostori && G.tip === 'poslovni') {
+    const epPOS = G.prostori['POS'] || {};
+    const seznamPOS = [];
+    Object.entries(epPOS).forEach(function(kv) {
+      const k = kv[0], n = kv[1];
+      if (!n || k === 'drugo_text') return;
+      seznamPOS.push(n > 1 ? n + 'x ' + (PROS_IME2[k]||k) : (PROS_IME2[k]||k));
+    });
+    if (epPOS['drugo_text']) seznamPOS.push(epPOS['drugo_text']);
+    if (seznamPOS.length) rows.push(['Prostori', seznamPOS.join(', ')]);
+  }
+
+  // Inštalacije
+  if (G.tlaki && G.tlaki.length) rows.push(['Tlaki', [...G.tlaki, ...(G.tlaki_drugo?[G.tlaki_drugo]:[])].join(', ')]);
+  if (G.zasteklitev_tip) rows.push(['Zasteklitev', [G.zasteklitev_tip, G.zasteklitev_okvir].filter(Boolean).join(', ')]);
+  if (G.ogr_prostori && G.ogr_prostori.length) rows.push(['Ogrevanje', G.ogr_prostori.join(', ')]);
+  if (G.ogrevala && G.ogrevala.length) rows.push(['Ogrevala', G.ogrevala.join(', ')]);
+
+  // Priključki
+  const priklYes = [];
+  if (G.prikl_elektrika === 'Da') priklYes.push('elektrika');
+  if (G.prikl_vodovod   === 'Da') priklYes.push('vodovod');
+  if (G.prikl_kanal     === 'Da') priklYes.push('kanalizacija');
+  if (G.prikl_plin      === 'Da') priklYes.push('plin');
+  if (G.prikl_telekom   === 'Da') priklYes.push('telekom');
+  if (priklYes.length) rows.push(['Priključki', priklYes.join(', ')]);
+  if (G.prikl_parkiranje && G.prikl_parkiranje.length) rows.push(['Parkiranje', G.prikl_parkiranje.join(', ')]);
+
+  // Obnove
+  if (G.obnove) {
+    const status = G.obnove['_status'];
+    if (status === 'ni_obnovljeno') rows.push(['Obnove', 'Ni bilo obnovljeno']);
+    else if (status === 'ni_podatka') rows.push(['Obnove', 'Ni podatka']);
+    else {
+      const obnoveList = [];
+      const obnIme = {celotna:'v celoti',streha:'streha',fasada:'fasada',okna:'okna',
+        vrata_vh:'vhodna vrata',vrata_not:'notranja vrata',tlaki:'tlaki',
+        radiatorji:'radiatorji',el_inst:'el. inst.',vod_inst:'vod. inst.',
+        kopalnica:'kopalnica',stranisce:'stranišče',pec:'peč'};
+      Object.entries(G.obnove).forEach(([k,v]) => {
+        if (k === '_status' || !v || !v.leto) return;
+        const ime = k === 'drugo' ? (v.ime || 'drugo') : (obnIme[k] || k);
+        obnoveList.push(v.leto + ': ' + ime);
+      });
+      if (obnoveList.length) rows.push(['Obnove', obnoveList.join(' | ')]);
+    }
+  }
+
+  // Zaključek — cene
+  if (G.cena_oglas) {
+    const cv = G.cena_oglas === 'ne_prodaja' ? 'ne prodaja' : G.cena_oglas === 'ne_povejo' ? 'ne povejo' : G.cena_oglas + ' €';
+    rows.push(['Cena (oglas)', cv]);
+  }
+  if (G.cena_pogodba) {
+    const cv = G.cena_pogodba === 'ne_prodaja' ? 'ne prodaja' : G.cena_pogodba === 'ne_povejo' ? 'ne povejo' : G.cena_pogodba + ' €';
+    rows.push(['Cena (pogodba)', cv]);
+  }
+  if (G.dokumentacija) rows.push(['Dokumentacija', G.dokumentacija]);
+  if (G.posebnosti)    rows.push(['Posebnosti', G.posebnosti]);
+  if (G.datum)         rows.push(['Datum ogleda', G.datum]);
+
+  document.getElementById('sumContent').innerHTML = rows.map(([k,v]) => `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;
+      padding:7px 0;border-bottom:1px solid var(--border);gap:8px;">
+      <span style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;">${k}</span>
+      <span style="font-size:13px;font-weight:600;color:var(--black);text-align:right;">${Array.isArray(v)?v.join(', '):v}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════
+// OPIS
+// ═══════════════════════
+
+function nastejNizko(arr) {
+  const a = arr.filter(Boolean).map(x => x.toLowerCase());
+  if (!a.length) return '';
+  if (a.length === 1) return a[0];
+  if (a.length === 2) return a[0] + ' in ' + a[1];
+  return a.slice(0,-1).join(', ') + ' ter ' + a[a.length-1];
+}
+
+function nastejViso(arr) {
+  const a = arr.filter(Boolean);
+  if (!a.length) return '';
+  if (a.length === 1) return a[0];
+  if (a.length === 2) return a[0] + ' in ' + a[1];
+  return a.slice(0,-1).join(', ') + ' ter ' + a[a.length-1];
+}
+
+function arrPlus(arr, extra) {
+  const base = Array.isArray(arr) ? arr : (arr ? [arr] : []);
+  return extra ? [...base, extra] : base;
+}
+
+const OGR_MAP = {
+  'el. peč':                       'električna peč',
+  'cen. peč na biomaso':           'centralna peč na biomaso',
+  'cen. peč na kurilno olje':      'centralna peč na kurilno olje',
+  'cen. plinska peč':              'centralna plinska peč',
+  'sam. plinska peč':              'samostojna plinska peč',
+  'sam. peč na kurilno olje':      'samostojna peč na kurilno olje',
+  'sam. peč na biomaso':           'samostojna peč na biomaso',
+  'toplotna črpalka':              'toplotna črpalka',
+  'el. grelnik':                   'električni grelnik',
+  'električni grelnik':            'električni grelnik',
+  'daljinska toplota':             'daljinsko ogrevanje',
+  'klimatska naprava':             'klimatska naprava',
+  'ploskovna v talnem razvodu':    'ploskovna v talnem razvodu',
+  'električni grelniki':           'električni grelniki',
+  'konvertorji':                   'konvertorji',
+};
+function normOgr(s) {
+  return OGR_MAP[s.toLowerCase()] || s.toLowerCase();
+}
+function nastejOgr(arr) {
+  return nastejNizko(arr.map(normOgr));
+}
+
+
+function genNadstropje(nadstropje, dvigalo) {
+  if (!nadstropje) return '';
+  const NADR_MAP = {
+    'P':'pritličju', 'VP':'visokem pritličju',
+    '1':'prvem nadstropju','2':'drugem nadstropju','3':'tretjem nadstropju',
+    '4':'četrtem nadstropju','5':'petem nadstropju','6':'šestem nadstropju',
+    '7':'sedmem nadstropju','8':'osmem nadstropju','9':'devetem nadstropju',
+    '10':'desetem nadstropju','Drugo':'višjem nadstropju'
+  };
+  const nadrTxt = NADR_MAP[nadstropje] || (nadstropje + '. nadstropju');
+  const dvigaloTxt = dvigalo === 'Da' ? ' z dvigalom' : dvigalo === 'Ne' ? ' brez dvigala' : '';
+  return nadrTxt + dvigaloTxt;
+}
+
+function genOrientacija(o) {
+  if (o.orient_VSE || ['S','J','V','Z','SZ','SV','JV','JZ'].filter(k=>o['orient_'+k]).length >= 4)
+    return 'Stanovanje ima vsestransko orientacijo.';
+  const MAP = {S:'severu',J:'jugu',V:'vzhodu',Z:'zahodu',SZ:'severozahodu',SV:'severovzhodu',JV:'jugovzhodu',JZ:'jugozahodu'};
+  const smeri = ['S','J','V','Z','SZ','SV','JV','JZ'].filter(k=>o['orient_'+k]).map(k=>MAP[k]);
+  if (!smeri.length) return '';
+  return 'Orientirano je proti ' + nastejNizko(smeri) + '.';
+}
+
+function genObjektOpis(st) {
+  const n = parseInt(st);
+  if (!st || isNaN(n)) return 'večstanovanjskega objekta';
+  if (n === 2) return 'dvo-stanovanjskega objekta';
+  if (n === 3) return 'tro-stanovanjskega objekta';
+  if (n === 4) return 'štiri-stanovanjskega objekta';
+  return 'večstanovanjskega objekta';
+}
+
+function genProstoriStan(prostori) {
+  const PROS_IME = {
+    predprostor:'predprostor', hodnik:'hodnik', stranisce:'stranišče',
+    kopalnica:'kopalnica', soba:'soba', spalnica:'spalnica',
+    kuhinja:'kuhinja', jedilnica:'jedilnica', dnevna:'dnevna soba',
+    galerija:'galerija', loza:'loža', balkon:'balkon', terasa:'terasa',
+    shramba:'shramba',
+  };
+  const ep = (prostori||{})['STA'] || {};
+  const seznam = [];
+  Object.entries(ep).forEach(([k,n]) => {
+    if (!n || k === 'drugo_text') return;
+    const ime = PROS_IME[k] || k;
+    seznam.push(n > 1 ? n + 'x ' + ime : ime);
+  });
+  if (ep['drugo_text']) seznam.push(ep['drugo_text']);
+  return seznam;
+}
+
+
+function genOpisPoslovni(o) {
+  // Poslovni objekt — samo povzetek podatkov, brez generiranega opisa
+  const rows = [];
+  if (o.vrsta)          rows.push('Tip objekta: ' + o.vrsta);
+  if (o.leto_izgradnje) rows.push('Leto izgradnje: ' + o.leto_izgradnje);
+  if (o.povrsina)       rows.push('Površina: ' + o.povrsina + ' m²');
+  if (o.vseljeno)       rows.push('Zaseden: ' + o.vseljeno);
+  if (o.vzdrzevano)     rows.push('Vzdrževan: ' + o.vzdrzevano);
+
+  // Prostori
+  const ep = (o.prostori||{})['POS'] || {};
+  const PROS_POS = {
+    pisarna:'pisarna',hodnik:'hodnik',stranisce:'stranišče',kopalnica:'kopalnica',
+    shramba:'shramba',garaza:'garaža',sejna:'sejna soba',recepcija:'recepcija',
+    arhiv:'arhiv',kuhinja:'kuhinja',skladisce:'skladišče',tehnicni:'tehnični prostor',
+  };
+  const seznam = [];
+  Object.entries(ep).forEach(([k,n]) => {
+    if (!n || k === 'drugo_text') return;
+    seznam.push(n > 1 ? n + 'x ' + (PROS_POS[k]||k) : (PROS_POS[k]||k));
+  });
+  if (ep['drugo_text']) seznam.push(ep['drugo_text']);
+  if (seznam.length) rows.push('Prostori: ' + seznam.join(', '));
+
+  // Inštalacije
+  const tlVsi = [...(o.tlaki||[]),...(o.tlaki_drugo?[o.tlaki_drugo]:[])];
+  if (tlVsi.length) rows.push('Finalni tlaki: ' + tlVsi.join(', '));
+  if (o.zasteklitev_tip || o.zasteklitev_okvir)
+    rows.push('Zasteklitev: ' + [o.zasteklitev_tip, o.zasteklitev_okvir].filter(Boolean).join(', '));
+  const ogrP = [...(o.ogr_prostori||[]),...(o.ogr_prostori_drugo?[o.ogr_prostori_drugo]:[])];
+  if (ogrP.length) rows.push('Ogrevanje: ' + ogrP.join(', '));
+  const ogrElem = [...(o.ogrevala||[]),...(o.ogrevala_drugo?[o.ogrevala_drugo]:[])];
+  if (ogrElem.length) rows.push('Ogrevala: ' + ogrElem.join(', '));
+  if (o.prezracevanje) rows.push('Prezračevanje: ' + o.prezracevanje);
+
+  // Priključki
+  const prikl = [];
+  if (o.prikl_elektrika==='Da') prikl.push('elektrika');
+  if (o.prikl_vodovod==='Da')   prikl.push('vodovod');
+  if (o.prikl_kanal==='Da')     prikl.push('kanalizacija');
+  if (o.prikl_plin==='Da')      prikl.push('plin');
+  if (o.prikl_telekom==='Da')   prikl.push('telekomunikacije');
+  if (prikl.length) rows.push('Priključki: ' + prikl.join(', '));
+  if (o.prikl_parkiranje&&o.prikl_parkiranje.length) rows.push('Parkiranje: ' + o.prikl_parkiranje.join(', '));
+
+  // Cena
+  const fmtCena = v => !v?'':v==='ne_prodaja'?'Se ne prodaja':v==='ne_povejo'?'Ne povejo':v+' €';
+  if (o.cena_oglas)  rows.push('Oglaševana cena: ' + fmtCena(o.cena_oglas));
+  if (o.cena_pogodba) rows.push('Pogodbena cena: ' + fmtCena(o.cena_pogodba));
+  if (o.dokumentacija) rows.push('Dokumentacija: ' + o.dokumentacija);
+  if (o.posebnosti && o.posebnosti.trim()) rows.push('Posebnosti: ' + o.posebnosti.trim());
+
+  return rows.join('\n');
+}
+
+
+function genOpisStan(o) {
+  const odst1 = [];
+  const odst2 = [];
+
+  // 1. Uvod — tip objekta + leto izgradnje
+  let uvod = 'Objekt predstavlja ' + genObjektOpis(o.st_stanovanj);
+  if (o.leto_izgradnje)
+    uvod += ', ki je bil po podatkih pridobljenih na ogledu zgrajen leta ' + o.leto_izgradnje;
+  uvod += '.';
+  odst1.push(uvod);
+
+  // 2. Obnove
+  if (o.obnove) {
+    const status = o.obnove['_status'];
+    if (status === 'ni_obnovljeno') {
+      odst1.push('Na podlagi informacij, pridobljenih ob ogledu nepremičnine, stanovanje ni bilo deleženo obnov.');
+    } else if (status === 'ni_podatka') {
+      odst1.push('Podatki o izvedenih obnovah stanovanja niso znani.');
+    } else {
+      const SPOL = {
+        celotna:  {glag1:'je bilo stanovanje v celoti obnovljeno'},
+        streha:   {glag1:'je bila obnovljena streha', glagSkup:'streha'},
+        fasada:   {glag1:'je bila obnovljena fasada', glagSkup:'fasada'},
+        okna:     {glag1:'so bila zamenjana okna', glagSkup:'okna'},
+        vrata_vh: {glag1:'so bila zamenjana vhodna vrata', glagSkup:'vhodna vrata'},
+        vrata_not:{glag1:'so bila zamenjana notranja vrata', glagSkup:'notranja vrata'},
+        tlaki:    {glag1:'so bili obnovljeni finalni tlaki', glagSkup:'finalni tlaki'},
+        radiatorji:{glag1:'so bili zamenjani radiatorji', glagSkup:'radiatorji'},
+        el_inst:  {glag1:'so bile obnovljene električne instalacije', glagSkup:'električne instalacije'},
+        vod_inst: {glag1:'so bile obnovljene vodovodne instalacije', glagSkup:'vodovodne instalacije'},
+        kopalnica:{glag1:'je bila v celoti obnovljena kopalnica', glagSkup:'kopalnica'},
+        stranisce:{glag1:'je bilo v celoti obnovljeno stranišče', glagSkup:'stranišče'},
+        pec:      {glag1:'je bila zamenjana peč', glagSkup:'peč'},
+      };
+      const byYear = {};
+      Object.entries(o.obnove).forEach(([k,v]) => {
+        if (k === '_status' || !v || !v.leto) return;
+        if (!byYear[v.leto]) byYear[v.leto] = [];
+        if (k === 'drugo') { if (v.ime) byYear[v.leto].push({k:'drugo', ime:v.ime}); }
+        else if (SPOL[k])  byYear[v.leto].push({k, ime: SPOL[k].glagSkup || k});
+      });
+      const leta = Object.keys(byYear).sort();
+      if (leta.length) {
+        const deliObnov = [];
+        leta.forEach(leto => {
+          const elems = byYear[leto];
+          if (!elems.length) return;
+          if (elems.length === 1) {
+            const e = elems[0];
+            if (e.k === 'celotna')
+              deliObnov.push('leta ' + leto + ' je bilo stanovanje v celoti obnovljeno');
+            else
+              deliObnov.push('leta ' + leto + ' ' + (SPOL[e.k] ? SPOL[e.k].glag1 : 'je bil obnovljen ' + e.ime));
+          } else {
+            const imeni = elems.map(e => e.ime || e.k);
+            deliObnov.push('leta ' + leto + ' so bili obnovljeni: ' + nastejNizko(imeni));
+          }
+        });
+        if (deliObnov.length) {
+          odst1.push('Po podatkih pridobljenih na ogledu so bile izvedene naslednje obnove: ' +
+            deliObnov.map(d => d.charAt(0).toUpperCase() + d.slice(1) + '.').join(' '));
+        }
+      }
+    }
+  }
+
+  // 3. Vseljenost
+  const vs = o.vseljeno, vz = o.vzdrzevano;
+  if (vs && vz) {
+    const M = {
+      'Da-Da':'V času ogleda je bilo stanovanje zasedeno in redno vzdrževan.',
+      'Da-Ne':'V času ogleda je bilo stanovanje zasedeno, vendar ni redno vzdrževan.',
+      'Ne-Da':'V času ogleda stanovanje ni bilo zasedeno, je pa redno vzdrževan.',
+      'Ne-Ne':'V času ogleda stanovanje ni bilo zasedeno in ni redno vzdrževan.',
+    };
+    odst1.push(M[vs+'-'+vz] || '');
+  } else if (vs) {
+    odst1.push('V času ogleda je bilo stanovanje ' + (vs==='Da'?'vseljeno':'nevseljeno') + '.');
+  }
+
+  // 4. Nadstropje + objekt
+  if (o.nadstropje) {
+    const nadrTxt = genNadstropje(o.nadstropje, null);
+    const dvigaloTxt = o.dvigalo === 'Da' ? ' z dvigalom' : o.dvigalo === 'Ne' ? ' brez dvigala' : '';
+    const objTxt = genObjektOpis(o.st_stanovanj);
+    odst2.push('Stanovanje se nahaja v ' + nadrTxt + ' ' + objTxt + dvigaloTxt + '.');
+  }
+
+  // 5. Orientacija
+  const orientTxt = genOrientacija(o);
+  if (orientTxt) odst2.push(orientTxt);
+
+  // 6. Prostori
+  if (o.tip === 'stan_v_hisi') {
+    const ETAZ_L2 = {K:'kleti',P:'pritličju','1N':'prvem nadstropju','2N':'drugem nadstropju',M:'mansardi'};
+    const PROS_SVH = {predprostor:'predprostor',hodnik:'hodnik',tehnicni:'tehnični prostor',
+      kurilnica:'kurilnica',shramba:'shramba',utility:'utility',garaza:'garaža',
+      stranisce:'stranišče',kopalnica:'kopalnica',soba:'soba',spalnica:'spalnica',
+      kuhinja:'kuhinja',jedilnica:'jedilnica',dnevna:'dnevna soba',galerija:'galerija',
+      loza:'loža',balkon:'balkon',terasa:'terasa'};
+    if (o.etaznost) odst2.push('Stanovanjska enota je etažnosti ' + o.etaznost + '.');
+    if (o.prostori) {
+      ['K','P','1N','2N','M'].forEach(function(e) {
+        const ep2 = o.prostori[e] || {};
+        const jeNeizd2 = (o.neizdelano||[]).includes(e);
+        if (jeNeizd2) return;
+        const ps = [];
+        Object.entries(ep2).forEach(function(kv) {
+          const k = kv[0], n = kv[1];
+          if (!n || k === 'drugo_text') return;
+          ps.push(n > 1 ? n + 'x ' + (PROS_SVH[k]||k) : (PROS_SVH[k]||k));
+        });
+        if (ep2['drugo_text']) ps.push(ep2['drugo_text']);
+        if (ps.length) odst2.push('V ' + ETAZ_L2[e] + ' se nahajajo: ' + nastejViso(ps) + '.');
+      });
+    }
+  } else {
+    const seznam = genProstoriStan(o.prostori);
+    if (seznam.length) odst2.push('V stanovanju so naslednji prostori: ' + nastejViso(seznam) + '.');
+  }
+
+  // 7. Tlaki
+  const tlVsi = [...(o.tlaki||[]), ...(o.tlaki_drugo?[o.tlaki_drugo]:[])];
+  if (tlVsi.length) odst2.push('Finalni tlaki so ' + nastejNizko(tlVsi) + '.');
+
+  // 8. Okna
+  if (o.zasteklitev_tip || o.zasteklitev_okvir) {
+    const tipMap = {'Starejša':'starejša','2-slojna':'2-slojna','3-slojna':'3-slojna'};
+    const okvirMap = {'PVC':'PVC','ALU':'ALU','Leseni':'lesenih','PVC/ALU':'PVC/ALU','ALU/Les':'ALU/lesenih'};
+    const tip = tipMap[o.zasteklitev_tip] || o.zasteklitev_tip || '';
+    const okvir = okvirMap[o.zasteklitev_okvir] || o.zasteklitev_okvir || '';
+    if (tip && okvir) odst2.push('Okna so ' + tip + ' v ' + okvir + ' okvirjih.');
+    else if (tip) odst2.push('Okna so ' + tip + '.');
+    else if (okvir) odst2.push('Okna so v ' + okvir + ' okvirjih.');
+  }
+
+  // 9. Ogrevanje
+  const ogrP = arrPlus(o.ogr_prostori, o.ogr_prostori_drugo);
+  const ogrV = arrPlus(o.ogr_voda, o.ogr_voda_drugo);
+  if (ogrP.length && ogrV.length && JSON.stringify(ogrP.map(x=>x.toLowerCase())) === JSON.stringify(ogrV.map(x=>x.toLowerCase())))
+    odst2.push('Za ogrevanje in pripravo tople sanitarne vode se uporablja ' + nastejOgr(ogrP) + '.');
+  else {
+    if (ogrP.length) odst2.push('Za ogrevanje se uporablja ' + nastejOgr(ogrP) + '.');
+    if (ogrV.length) odst2.push('Za pripravo tople sanitarne vode se uporablja ' + nastejOgr(ogrV) + '.');
+  }
+  const ogrElemFull = [...(o.ogrevala||[]), ...(o.ogrevala_drugo?[o.ogrevala_drugo]:[])];
+  if (ogrElemFull.length) {
+    odst2.push('Ogrevala so ' + nastejNizko(ogrElemFull.map(x => x.toLowerCase())) + '.');
+  }
+
+  // 10. Priključki (za stanovanje v hiši)
+  if (o.tip === 'stan_v_hisi') {
+    const prikl = [];
+    if (o.prikl_elektrika === 'Da') prikl.push('elektrodistribucijsko omrežje');
+    if (o.prikl_vodovod   === 'Da') prikl.push('javni vodovod');
+    if (o.prikl_kanal     === 'Da') prikl.push('javno kanalizacijsko omrežje');
+    if (o.prikl_plin      === 'Da') prikl.push('plinovodno omrežje');
+    if (o.prikl_telekom   === 'Da') prikl.push('telekomunikacijsko omrežje');
+    if (prikl.length) odst2.push('Objekt je priključen na ' + nastejViso(prikl) + '.');
+  }
+
+  // 11. Parkiranje
+  if (o.prikl_parkiranje && o.prikl_parkiranje.length) {
+    const PARK_MAP = {
+      'Garaža v objektu':'v garaži objekta','Garaža ob objektu':'v garaži ob objektu',
+      'Na dvorišču':'na dvorišču','Pod nadstreškom':'pod nadstreškom','Ni urejeno':null,
+    };
+    const parkOk = o.prikl_parkiranje.filter(x=>PARK_MAP[x]!==null).map(x=>PARK_MAP[x]||x.toLowerCase());
+    if (parkOk.length) odst2.push('Parkiranje je urejeno ' + nastejNizko(parkOk) + '.');
+    else if (o.prikl_parkiranje.includes('Ni urejeno')) odst2.push('Parkiranje je mogoče v okolici objekta.');
+  }
+
+  const deli = [];
+  if (odst1.length) deli.push(odst1.join(' '));
+  if (odst2.length) deli.push(odst2.join(' '));
+  if (o.posebnosti && o.posebnosti.trim()) deli.push(o.posebnosti.trim());
+  return deli.join('\n\n');
+}
+
+
+function genOpis(o) {
+  if (o.tip === 'stanovanje' || o.tip === 'stan_v_hisi') return genOpisStan(o);
+  if (o.tip === 'poslovni') return genOpisPoslovni(o);
+  if (o.tip !== 'hisa') return tipL(o.tip) + '. (Podatki v pripravi.)';
+
+  const odst1 = []; // prvi odstavek: obnove + vseljenost
+  const odst2 = []; // drugi odstavek: etažnost + prostori + tlaki + okna + ogrevanje + priključki + parkiranje
+
+  // ── 1. TIP HIŠE ──────────────────────────────────────────────
+  const vrstaIme = {
+    'Samostojna': 'samostojno stanovanjsko hišo',
+    'Dvojček':    'hišo — dvojček',
+    'Vrstna':     'vrstno hišo',
+    'Atrijska':   'atrijsko hišo',
+  }[o.vrsta] || (o.vrsta ? o.vrsta.toLowerCase() + ' hišo' : 'stanovanjsko hišo');
+
+  // ── 2. LETO IZGRADNJE ─────────────────────────────────────────
+  let uvod = 'Objekt predstavlja ' + vrstaIme;
+  if (o.leto_izgradnje)
+    uvod += ', ki je bila po podatkih pridobljenih na ogledu zgrajena leta ' + o.leto_izgradnje;
+  uvod += '.';
+  odst1.push(uvod);
+
+  // ── 3. OBNOVE ─────────────────────────────────────────────────
+  const SPOL = {
+    celotna:   {glag1:'v celoti obnovljen'},
+    streha:    {glag1:'je bila obnovljena streha', glagSkup:'streha'},
+    fasada:    {glag1:'je bila obnovljena fasada', glagSkup:'fasada'},
+    okna:      {glag1:'so bila zamenjana okna', glagSkup:'okna'},
+    vrata_vh:  {glag1:'so bila zamenjana vhodna vrata', glagSkup:'vhodna vrata'},
+    vrata_not: {glag1:'so bila zamenjana notranja vrata', glagSkup:'notranja vrata'},
+    tlaki:     {glag1:'so bili obnovljeni finalni tlaki', glagSkup:'finalni tlaki'},
+    radiatorji:{glag1:'so bili zamenjani radiatorji', glagSkup:'radiatorji'},
+    el_inst:   {glag1:'so bile obnovljene električne instalacije', glagSkup:'električne instalacije'},
+    vod_inst:  {glag1:'so bile obnovljene vodovodne instalacije', glagSkup:'vodovodne instalacije'},
+    kopalnica: {glag1:'je bila v celoti obnovljena kopalnica', glagSkup:'kopalnica'},
+    stranisce: {glag1:'je bilo v celoti obnovljeno stranišče', glagSkup:'stranišče'},
+    pec:       {glag1:'je bila zamenjana centralna peč', glagSkup:'centralna peč'},
+  };
+
+  if (o.obnove) {
+    const status = o.obnove['_status'];
+    if (status === 'ni_obnovljeno') {
+      odst1.push('Na podlagi informacij, pridobljenih ob ogledu nepremičnine, objekt ni bil deležen obnov.');
+    } else if (status === 'ni_podatka') {
+      odst1.push('Podatki o izvedenih obnovah objekta niso znani.');
+    } else {
+      // Grupiraj po letnici
+      const byYear = {};
+      Object.entries(o.obnove).forEach(([k, v]) => {
+        if (k === '_status' || !v || !v.leto) return;
+        if (!byYear[v.leto]) byYear[v.leto] = [];
+        if (k === 'drugo') { if (v.ime) byYear[v.leto].push({k:'drugo', ime:v.ime}); }
+        else if (SPOL[k])  byYear[v.leto].push({k, ime: SPOL[k].glagSkup || k});
+      });
+
+      const leta = Object.keys(byYear).sort();
+      if (leta.length) {
+        const deliObnov = [];
+        leta.forEach(leto => {
+          const elems = byYear[leto];
+          if (!elems.length) return;
+          if (elems.length === 1) {
+            const e = elems[0];
+            if (e.k === 'celotna')
+              deliObnov.push('leta ' + leto + ' je bil objekt v celoti obnovljen');
+            else
+              deliObnov.push('leta ' + leto + ' ' + (SPOL[e.k] ? SPOL[e.k].glag1 : 'je bil obnovljen ' + e.ime));
+          } else {
+            const imeni = elems.map(e => e.ime || e.k);
+            deliObnov.push('leta ' + leto + ' so bili obnovljeni: ' + nastejNizko(imeni));
+          }
+        });
+        if (deliObnov.length) {
+          const stavek = 'Po podatkih pridobljenih na ogledu so bile izvedene naslednje obnove: ' +
+            deliObnov.map((d,i) => {
+              // capitalize first letter of each
+              return d.charAt(0).toUpperCase() + d.slice(1) + '.';
+            }).join(' ');
+          odst1.push(stavek);
+        }
+      }
+    }
+  }
+
+  // ── 4. VSELJENOST × VZDRŽEVANOST ──────────────────────────────
+  const vs = o.vseljeno, vz = o.vzdrzevano;
+  if (vs && vz) {
+    const MATRIKA = {
+      'Da-Da': 'V času ogleda je bila stanovanjska hiša zasedena in redno vzdrževana.',
+      'Da-Ne': 'V času ogleda je bila stanovanjska hiša zasedena, vendar ni redno vzdrževana.',
+      'Ne-Da': 'V času ogleda stanovanjska hiša ni bila zasedena, je pa redno vzdrževana.',
+      'Ne-Ne': 'V času ogleda stanovanjska hiša ni bila zasedena in ni redno vzdrževana.',
+    };
+    odst1.push(MATRIKA[vs + '-' + vz] || '');
+  } else if (vs) {
+    odst1.push('V času ogleda je bila stanovanjska hiša ' + (vs === 'Da' ? 'zasedena' : 'nezasedena') + '.');
+  }
+
+  // ── 5. ETAŽNOST (opisna) ──────────────────────────────────────
+  const ETAZ_OPIS = {
+    'P':         'pritličje',
+    'K+P':       'klet in pritličje',
+    'P+M':       'pritličje in mansarda',
+    'P+1':       'pritličje in eno nadstropje',
+    'P+1+M':     'pritličje, eno nadstropje in mansarda',
+    'P+2':       'pritličje in dve nadstropji',
+    'P+2+M':     'pritličje, dve nadstropji in mansarda',
+    'K+P+1':     'klet, pritličje in eno nadstropje',
+    'K+P+1+M':   'klet, pritličje, eno nadstropje in mansarda',
+    'K+P+2':     'klet, pritličje in dve nadstropji',
+    'K+P+2+M':   'klet, pritličje, dve nadstropji in mansarda',
+  };
+  if (o.etaznost) {
+    const eOpis = ETAZ_OPIS[o.etaznost] || o.etaznost;
+    odst2.push('Stanovanjska hiša je etažnosti ' + eOpis + '.');
+  }
+
+  // ── 6. PROSTORI PO ETAŽAH ─────────────────────────────────────
+  const ETAZ_L = {K:'kleti', P:'pritličju', '1N':'prvem nadstropju', '2N':'drugem nadstropju', M:'mansardi'};
+  const PROS_IME = {
+    predprostor:'predprostor', hodnik:'hodnik', tehnicni:'tehnični prostor',
+    kurilnica:'kurilnica', shramba:'shramba', utility:'utility', garaza:'garaža',
+    stranisce:'stranišče', kopalnica:'kopalnica', soba:'soba', spalnica:'spalnica',
+    kuhinja:'kuhinja', jedilnica:'jedilnica', dnevna:'dnevna soba', galerija:'galerija',
+    loza:'loža', balkon:'balkon', terasa:'terasa',
+  };
+  if (o.prostori) {
+    ['K','P','1N','2N','M'].forEach(e => {
+      const ep = o.prostori[e] || {};
+      const jeNeizd = (o.neizdelano||[]).includes(e);
+      if (jeNeizd) {
+        const neizOpis = {K:'Klet je neizdelana.', P:'Pritličje je neizdelano.',
+          '1N':'Prvo nadstropje je neizdelano.', '2N':'Drugo nadstropje je neizdelano.', M:'Mansarda je neizdelana.'};
+        odst2.push(neizOpis[e]);
+        return;
+      }
+      const seznam = [];
+      Object.entries(ep).forEach(([k, n]) => {
+        if (!n || k === 'drugo_text') return;
+        const ime = PROS_IME[k] || k;
+        seznam.push(n > 1 ? n + 'x ' + ime : ime);
+      });
+      if (ep['drugo_text']) seznam.push(ep['drugo_text']);
+      if (seznam.length)
+        odst2.push('V ' + ETAZ_L[e] + ' se nahajajo: ' + nastejViso(seznam) + '.');
+    });
+  }
+  if (o.neizd_drugo && o.neizd_drugo.trim())
+    odst2.push(o.neizd_drugo.trim() + ' je neizdelano.');
+  if (o.opombe_prostori) odst2.push(o.opombe_prostori);
+
+  // ── 7. FINALNI TLAKI ──────────────────────────────────────────
+  const tlVsi = [...(o.tlaki||[]), ...(o.tlaki_drugo ? [o.tlaki_drugo] : [])];
+  if (tlVsi.length) odst2.push('Finalni tlaki so ' + nastejNizko(tlVsi) + '.');
+
+  // ── 8. OKNA / ZASTEKLITEV ─────────────────────────────────────
+  if (o.zasteklitev_tip || o.zasteklitev_okvir) {
+    const tipMap = {
+      'Starejša': 'starejša',
+      '2-slojna': '2-slojna',
+      '3-slojna': '3-slojna',
+    };
+    const okvirMap = {
+      'PVC': 'PVC', 'ALU': 'ALU', 'Leseni': 'lesenih', 'PVC/ALU': 'PVC/ALU', 'ALU/Les': 'ALU/lesenih',
+    };
+    const tip = tipMap[o.zasteklitev_tip] || o.zasteklitev_tip || '';
+    const okvir = okvirMap[o.zasteklitev_okvir] || o.zasteklitev_okvir || '';
+    if (tip && okvir)
+      odst2.push('Okna so ' + tip + ' v ' + okvir + ' okvirjih.');
+    else if (tip)
+      odst2.push('Okna so ' + tip + '.');
+    else if (okvir)
+      odst2.push('Okna so v ' + okvir + ' okvirjih.');
+  }
+
+  // ── 9. OGREVANJE ──────────────────────────────────────────────
+  const ogrP = arrPlus(o.ogr_prostori, o.ogr_prostori_drugo);
+  const ogrV = arrPlus(o.ogr_voda, o.ogr_voda_drugo);
+  if (ogrP.length && ogrV.length && JSON.stringify(ogrP.map(x=>x.toLowerCase())) === JSON.stringify(ogrV.map(x=>x.toLowerCase())))
+    odst2.push('Za ogrevanje in pripravo tople sanitarne vode se uporablja ' + nastejOgr(ogrP) + '.');
+  else {
+    if (ogrP.length) odst2.push('Za ogrevanje se uporablja ' + nastejOgr(ogrP) + '.');
+    if (ogrV.length) odst2.push('Za pripravo tople sanitarne vode se uporablja ' + nastejOgr(ogrV) + '.');
+  }
+  const ogrElemFull = [...(o.ogrevala||[]), ...(o.ogrevala_drugo ? [o.ogrevala_drugo] : [])];
+  if (ogrElemFull.length) {
+    const opisOgr = nastejNizko(ogrElemFull.map(x =>
+      x.toLowerCase()
+    ));
+    odst2.push('Ogrevala so ' + opisOgr + '.');
+  }
+
+  // ── 10. PARKIRANJE ────────────────────────────────────────────
+  if (o.prikl_parkiranje && o.prikl_parkiranje.length) {
+    const PARK_MAP = {
+      'Garaža v objektu':  'v garaži objekta',
+      'Garaža ob objektu': 'v garaži ob objektu',
+      'Na dvorišču':       'na dvorišču',
+      'Pod nadstreškom':   'pod nadstreškom',
+      'Ni urejeno':        null,
+    };
+    const parkOk = o.prikl_parkiranje.filter(x => PARK_MAP[x] !== null).map(x => PARK_MAP[x] || x.toLowerCase());
+    const niUrejeno = o.prikl_parkiranje.includes('Ni urejeno');
+    if (parkOk.length)
+      odst2.push('Parkiranje je urejeno ' + nastejNizko(parkOk) + '.');
+    else if (niUrejeno)
+      odst2.push('Parkiranje je mogoče v okolici objekta.');
+  }
+
+  // ── 11. PRIKLJUČKI ────────────────────────────────────────────
+  const prikl = [];
+  if (o.prikl_elektrika === 'Da') prikl.push('elektrodistribucijsko omrežje');
+  if (o.prikl_vodovod   === 'Da') prikl.push('javni vodovod');
+  if (o.prikl_kanal     === 'Da') prikl.push('javno kanalizacijsko omrežje');
+  if (o.prikl_plin      === 'Da') prikl.push('plinovodno omrežje');
+  if (o.prikl_telekom   === 'Da') prikl.push('telekomunikacijsko omrežje');
+  if (prikl.length) {
+    const hisaT = (o.vrsta === 'Dvojček' ? 'Hiša' : (o.vrsta ? o.vrsta + ' hiša' : 'Hiša'));
+    odst2.push('Objekt je priključen na ' + nastejViso(prikl) + '.');
+  }
+  if (o.prikl_vodovod === 'Ne' && o.prikl_vodovod_alt && o.prikl_vodovod_alt.length)
+    odst2.push('Objekt se oskrbuje z vodo iz ' + nastejNizko(o.prikl_vodovod_alt) + '.');
+  if (o.prikl_kanal === 'Ne' && o.prikl_kanal_alt && o.prikl_kanal_alt.length) {
+    const kanalSkl = o.prikl_kanal_alt.map(x => ({'Greznica':'greznico','Čistilna naprava':'čistilno napravo','Lovilnik maščob':'lovilnik maščob'}[x] || x.toLowerCase()));
+    odst2.push('Odpadna voda se odvaja v ' + nastejNizko(kanalSkl) + '.');
+  }
+
+  // ── SESTAVI V 2 ODSTAVKA ──────────────────────────────────────
+  const deli = [];
+  if (odst1.length) deli.push(odst1.join(' '));
+  if (odst2.length) deli.push(odst2.join(' '));
+  if (o.posebnosti && o.posebnosti.trim()) deli.push(o.posebnosti.trim());
+  return deli.join('\n\n');
+}
+
+function kopiraj() {
+  navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('opisText').innerText);
+  toast('Kopirano!');
+}
+
+function deliOpis() {
+  const opis = document.getElementById('opisText').innerText;
+  const naslov = G ? G.naslov : '';
+  const datum = G ? G.datum : '';
+  const title = 'Ogled: ' + naslov + ' · ' + datum;
+
+  if (navigator.share) {
+    navigator.share({ title: title, text: opis })
+      .catch(() => {});
+  } else {
+    // Fallback: kopiraj v clipboard + toast
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(opis).then(() => {
+        toast('Opis kopiran! Prilepi ga v email.');
+      });
+    } else {
+      toast('Kopiraj opis ročno in pošlji po emailu.');
+    }
+  }
+}
+
+// ═══════════════════════
+// PWA INSTALL
+// ═══════════════════════
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Prikaži banner samo če ni nameščeno
+  if(!window.matchMedia('(display-mode: standalone)').matches) {
+    document.getElementById('installBanner').classList.remove('hidden');
+  }
+});
+
+function installPWA() {
+  if(deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      closeBanner();
+    });
+  }
+}
+
+function closeBanner() {
+  document.getElementById('installBanner').classList.add('hidden');
+  localStorage.setItem('nai_banner_closed','1');
+}
+
+// iOS navodila (Safari ne podpira beforeinstallprompt)
+function checkiOS() {
+  const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isStandalone = window.navigator.standalone;
+  const closed = localStorage.getItem('nai_banner_closed');
+  if(isIOS && !isStandalone && !closed) {
+    const b = document.getElementById('installBanner');
+    b.classList.remove('hidden');
+    document.querySelector('.ib-title').textContent = '📱 Namesti na domači zaslon';
+    document.querySelector('.ib-sub').textContent = 'Pritisni Deli → "Dodaj na začetni zaslon"';
+    document.getElementById('installBtn').style.display='none';
+  }
+}
+
+// ═══════════════════════
+// TOAST
+// ═══════════════════════
+function toast(m) {
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ═══════════════════════
+// INIT
+// ═══════════════════════
+checkiOS();
+showList();
+</script>
